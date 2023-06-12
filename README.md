@@ -93,4 +93,4 @@ scarlink_tiles -o multiome_out -c celltype
 ```
 
 #### 4. Chromatin potential
-Chromatin potential analysis can be performed after running steps 1 and 2. Please refer to example notebook.
+Chromatin potential analysis can be performed after running steps 1 and 2. Please refer to [example notebook](https://github.com/snehamitra/SCARlink_private/blob/main/notebooks/chromatin_potential.ipynb).
