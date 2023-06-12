@@ -1,0 +1,17 @@
+conda create -n scarlink-env python=3.8
+conda activate scarlink-env
+conda install -c conda-forge mamba
+mamba install conda-forge tensorflow
+mamba install -c conda-forge r-seurat
+mamba install -c conda-forge r-irkernel
+mamba install -c anaconda jupyter
+mamba install -c bioconda bioconductor-rhdf5
+mamba install -c conda-forge r-devtools
+mamba install -c conda-forge r-biocmanager
+mamba install -c bioconda bioconductor-bsgenome.mmusculus.ucsc.mm10
+mamba install -c bioconda bioconductor-bsgenome.hsapiens.ucsc.hg38
+mamba install -c bioconda bioconductor-chromvar
+mamba install -c bioconda bioconductor-motifmatchr
+mamba install -c bioconda bioconductor-oncomix
+mamba install -c bioconda bioconductor-complexheatmap
+devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())
