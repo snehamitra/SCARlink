@@ -136,29 +136,14 @@ class RegressionModel:
     
     def compute_gene_tile_significance(self, gene, celltype_col):
         f = h5py.File(self.output_dir + self.out_file, mode = 'a')
-        # if 'tile_significance/' + celltype_col + '/' + gene in f.keys():
-        #     f.close()
-        #     return
+        if 'tile_significance/' + celltype_col + '/' + gene in f.keys():
+            f.close()
+            return
         z_d = self.compute_gene_tile_significance_shap(gene, celltype_col)
         p_d = self.compute_gene_tile_significance_signed_rank(gene, celltype_col, z_d)
         write_significance(f, "tile_significance/" + celltype_col + '/' + gene, z_d, p_d)
         f.close()
         return
-        # dfs = []
-        # tiles = self.input_file_handle.select(gene + '/tile_info')
-        # for c in z_d:
-        #     c_df = pandas.DataFrame(columns=['chr', 'start', 'end', celltype_col, 'z-score'])
-        #     c_df['chr'] = tiles['seqnames']
-        #     c_df['start'] = tiles['start'].astype(int)
-        #     c_df['end'] = tiles['end'].astype(int)
-        #     c_df[celltype_col] = c
-        #     c_df['z-score'] = z_d[c]
-        #     dfs.append(c_df)
-        # df = pandas.concat(dfs, axis=0)
-        # df['gene'] = gene
-        # f.close()
-        # return df
-
     
     def compute_gene_tile_significance_shap(self, gene, celltype_col):
         f = h5py.File(self.output_dir + self.out_file, mode = 'r')

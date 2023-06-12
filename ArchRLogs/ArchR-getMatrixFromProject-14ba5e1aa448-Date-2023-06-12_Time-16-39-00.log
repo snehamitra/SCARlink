@@ -1,0 +1,465 @@
+
+           ___      .______        ______  __    __  .______      
+          /   \     |   _  \      /      ||  |  |  | |   _  \     
+         /  ^  \    |  |_)  |    |  ,----'|  |__|  | |  |_)  |    
+        /  /_\  \   |      /     |  |     |   __   | |      /     
+       /  _____  \  |  |\  \\___ |  `----.|  |  |  | |  |\  \\___.
+      /__/     \__\ | _| `._____| \______||__|  |__| | _| `._____|
+    
+Logging With ArchR!
+
+Start Time : 2023-06-12 16:39:00
+
+------- ArchR Info
+
+ArchRThreads = 4
+
+------- System Info
+
+Computer OS = unix
+Total Cores = 8
+
+------- Session Info
+
+R version 4.2.3 (2023-03-15)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS Big Sur ... 10.16
+
+Matrix products: default
+BLAS/LAPACK: /Users/mitras2/opt/anaconda3/envs/scarlink-env/lib/libopenblasp-r0.3.23.dylib
+
+Random number generation:
+ RNG:     L'Ecuyer-CMRG 
+ Normal:  Inversion 
+ Sample:  Rejection 
+ 
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+ [1] parallel  stats4    grid      tools     stats     graphics  grDevices
+ [8] utils     datasets  methods   base     
+
+other attached packages:
+ [1] oncomix_1.20.0              SeuratObject_4.1.3         
+ [3] Seurat_4.3.0                rhdf5_2.42.0               
+ [5] SummarizedExperiment_1.28.0 Biobase_2.58.0             
+ [7] MatrixGenerics_1.10.0       Rcpp_1.0.10                
+ [9] Matrix_1.5-4.1              GenomicRanges_1.50.0       
+[11] GenomeInfoDb_1.34.9         IRanges_2.32.0             
+[13] S4Vectors_0.36.0            BiocGenerics_0.44.0        
+[15] matrixStats_1.0.0           data.table_1.14.8          
+[17] stringr_1.5.0               plyr_1.8.8                 
+[19] magrittr_2.0.3              ggplot2_3.4.2              
+[21] gtable_0.3.3                gtools_3.9.4               
+[23] gridExtra_2.3               ArchR_1.0.2                
+
+loaded via a namespace (and not attached):
+ [1] Rtsne_0.16             colorspace_2.1-0       deldir_1.0-9          
+ [4] ellipsis_0.3.2         ggridges_0.5.4         mclust_6.0.0          
+ [7] XVector_0.38.0         spatstat.data_3.0-1    leiden_0.4.3          
+[10] listenv_0.9.0          ggrepel_0.9.3          fansi_1.0.4           
+[13] codetools_0.2-19       splines_4.2.3          polyclip_1.10-4       
+[16] jsonlite_1.8.5         ica_1.0-3              cluster_2.1.4         
+[19] png_0.1-8              uwot_0.1.14            spatstat.sparse_3.0-1 
+[22] shiny_1.7.4            sctransform_0.3.5      compiler_4.2.3        
+[25] httr_1.4.6             fastmap_1.1.1          lazyeval_0.2.2        
+[28] cli_3.6.1              later_1.3.1            htmltools_0.5.5       
+[31] igraph_1.4.2           glue_1.6.2             GenomeInfoDbData_1.2.9
+[34] RANN_2.6.1             reshape2_1.4.4         dplyr_1.1.2           
+[37] scattermore_1.1        vctrs_0.6.2            rhdf5filters_1.10.0   
+[40] nlme_3.1-162           spatstat.explore_3.2-1 progressr_0.13.0      
+[43] lmtest_0.9-40          spatstat.random_3.1-5  globals_0.16.2        
+[46] mime_0.12              miniUI_0.1.1.1         lifecycle_1.0.3       
+[49] irlba_2.3.5.1          goftest_1.2-3          future_1.32.0         
+[52] zlibbioc_1.44.0        MASS_7.3-60            zoo_1.8-12            
+[55] scales_1.2.1           promises_1.2.0.1       spatstat.utils_3.0-3  
+[58] RColorBrewer_1.1-3     reticulate_1.26        pbapply_1.7-0         
+[61] stringi_1.7.12         rlang_1.1.1            pkgconfig_2.0.3       
+[64] bitops_1.0-7           lattice_0.21-8         tensor_1.5            
+[67] ROCR_1.0-11            purrr_1.0.1            Rhdf5lib_1.20.0       
+[70] patchwork_1.1.2        htmlwidgets_1.6.2      cowplot_1.1.1         
+[73] tidyselect_1.2.0       parallelly_1.36.0      RcppAnnoy_0.0.20      
+[76] R6_2.5.1               generics_0.1.3         DelayedArray_0.24.0   
+[79] pillar_1.9.0           withr_2.5.0            fitdistrplus_1.1-11   
+[82] abind_1.4-5            survival_3.5-5         RCurl_1.98-1.12       
+[85] sp_1.6-1               tibble_3.2.1           future.apply_1.11.0   
+[88] KernSmooth_2.23-21     utf8_1.2.3             spatstat.geom_3.2-1   
+[91] plotly_4.10.2          digest_0.6.31          xtable_1.8-4          
+[94] tidyr_1.3.0            httpuv_1.6.11          munsell_0.5.0         
+[97] viridisLite_0.4.1     
+
+
+------- Log Info
+
+
+2023-06-12 16:39:00 : getMatrixFromProject Input-Parameters, Class = list
+
+getMatrixFromProject Input-Parameters$ArchRProj: length = 1
+
+getMatrixFromProject Input-Parameters$useMatrix: length = 1
+[1] "TileMatrix"
+
+
+getMatrixFromProject Input-Parameters$useSeqnames: length = 0
+NULL
+
+
+getMatrixFromProject Input-Parameters$verbose: length = 1
+[1] TRUE
+
+
+getMatrixFromProject Input-Parameters$binarize: length = 1
+[1] FALSE
+
+
+getMatrixFromProject Input-Parameters$threads: length = 1
+[1] 4
+
+
+getMatrixFromProject Input-Parameters$logFile: length = 1
+[1] "ArchRLogs/ArchR-getMatrixFromProject-14ba5e1aa448-Date-2023-06-12_Time-16-39-00.log"
+
+
+2023-06-12 16:39:00 : Reading TileMatrix : hft_ctx_w21_dc2r2_r1(1 of 3), 0.009 mins elapsed.
+2023-06-12 16:39:00 : Reading TileMatrix : hft_ctx_w21_dc2r2_r2(2 of 3), 0.009 mins elapsed.
+2023-06-12 16:39:00 : Reading TileMatrix : hft_ctx_w21_dc1r3_r1(3 of 3), 0.009 mins elapsed.
+
+2023-06-12 16:39:00 : getMatrixFromArrow Input-Parameters, Class = list
+
+2023-06-12 16:39:00 : getMatrixFromArrow Input-Parameters, Class = list
+
+getMatrixFromArrow Input-Parameters$ArrowFile: length = 1
+
+getMatrixFromArrow Input-Parameters$ArrowFile: length = 1
+                                                                             hft_ctx_w21_dc2r2_r2 
+"/Users/mitras2/workspace/scarlink_outs/cortex_data/scatac/ArrowFiles/hft_ctx_w21_dc2r2_r2.arrow" 
+
+                                                                             hft_ctx_w21_dc2r2_r1 
+"/Users/mitras2/workspace/scarlink_outs/cortex_data/scatac/ArrowFiles/hft_ctx_w21_dc2r2_r1.arrow" 
+
+
+getMatrixFromArrow Input-Parameters$useMatrix: length = 1
+
+[1] "TileMatrix"
+getMatrixFromArrow Input-Parameters$useMatrix: length = 1
+
+[1] "TileMatrix"
+
+
+getMatrixFromArrow Input-Parameters$useSeqnames: length = 0
+
+getMatrixFromArrow Input-Parameters$useSeqnames: length = 0
+NULL
+
+NULL
+
+
+getMatrixFromArrow Input-Parameters$cellNames: length = 2326
+
+[1]getMatrixFromArrow Input-Parameters$cellNames: length = 3333
+ "hft_ctx_w21_dc2r2_r2#ACTTGAATCCGGTTGA-1"
+[2] "hft_ctx_w21_dc2r2_r2#GCGTAACGTTAGACCA-1"
+[3] "hft_ctx_w21_dc2r2_r2#GAAGGCTAGACCATAC-1"
+[4] "hft_ctx_w21_dc2r2_r2#TCAGTAATCTAGCGTG-1"
+[5] "hft_ctx_w21_dc2r2_r2#CTGGTTACACAACAAA-1"
+[6] "hft_ctx_w21_dc2r2_r2#GCCACTAAGGCGGATG-1"
+[1] "hft_ctx_w21_dc2r2_r1#GGTTGAGCAGCTAATT-1"
+[2] "hft_ctx_w21_dc2r2_r1#AAGGTATAGGAACGGT-1"
+[3]
+ "hft_ctx_w21_dc2r2_r1#TATGACTCACCATATG-1"
+[4] "hft_ctx_w21_dc2r2_r1#ATTAGTCCAATCCTAG-1"
+[5] "hft_ctx_w21_dc2r2_r1#GATTGGTTCGATTTAG-1"
+[6] "hft_ctx_w21_dc2r2_r1#TCAAGGAAGCCTCTGT-1"
+
+
+getMatrixFromArrow Input-Parameters$ArchRProj: length = 1
+
+getMatrixFromArrow Input-Parameters$ArchRProj: length = 1
+
+getMatrixFromArrow Input-Parameters$verbose: length = 1
+
+getMatrixFromArrow Input-Parameters$verbose: length = 1
+[1] FALSE
+
+[1] FALSE
+
+
+getMatrixFromArrow Input-Parameters$binarize: length = 1
+
+[1] FALSE
+getMatrixFromArrow Input-Parameters$binarize: length = 1
+
+[1] FALSE
+
+
+getMatrixFromArrow Input-Parameters$logFile: length = 1
+
+[1]getMatrixFromArrow Input-Parameters$logFile: length = 1
+ "ArchRLogs/ArchR-getMatrixFromProject-14ba5e1aa448-Date-2023-06-12_Time-16-39-00.log"
+
+2023-06-12 16:39:00 : getMatrixFromArrow Input-Parameters, Class = list
+
+[1] "ArchRLogs/ArchR-getMatrixFromProject-14ba5e1aa448-Date-2023-06-12_Time-16-39-00.log"
+
+
+
+
+getMatrixFromArrow Input-Parameters$ArrowFile: length = 1
+                                                                             hft_ctx_w21_dc1r3_r1 
+"/Users/mitras2/workspace/scarlink_outs/cortex_data/scatac/ArrowFiles/hft_ctx_w21_dc1r3_r1.arrow" 
+
+
+getMatrixFromArrow Input-Parameters$useMatrix: length = 1
+[1] "TileMatrix"
+
+
+getMatrixFromArrow Input-Parameters$useSeqnames: length = 0
+NULL
+
+
+getMatrixFromArrow Input-Parameters$cellNames: length = 3033
+[1] "hft_ctx_w21_dc1r3_r1#AAGGTGCAGGCGGGTA-1"
+[2] "hft_ctx_w21_dc1r3_r1#TCTGGCTTCGCTAGCA-1"
+[3] "hft_ctx_w21_dc1r3_r1#TCATTTGGTCTAACAG-1"
+[4] "hft_ctx_w21_dc1r3_r1#TGTAACTCAATTGAGA-1"
+[5] "hft_ctx_w21_dc1r3_r1#GCTAACCCAATCCTGA-1"
+[6] "hft_ctx_w21_dc1r3_r1#ATTCAACCACAACAGG-1"
+
+
+getMatrixFromArrow Input-Parameters$ArchRProj: length = 1
+
+getMatrixFromArrow Input-Parameters$verbose: length = 1
+[1] FALSE
+
+
+getMatrixFromArrow Input-Parameters$binarize: length = 1
+[1] FALSE
+
+
+getMatrixFromArrow Input-Parameters$logFile: length = 1
+[1] "ArchRLogs/ArchR-getMatrixFromProject-14ba5e1aa448-Date-2023-06-12_Time-16-39-00.log"
+
+
+
+2023-06-12 16:39:02 : featureDF hft_ctx_w21_dc2r2_r2, Class = DFrame
+
+2023-06-12 16:39:02 : featureDF hft_ctx_w21_dc2r2_r1, Class = DFrame
+DataFrameDataFrame with  with 60620956062095 row rowss and  and 33 column columnss
+
+
+2023-06-12 16:39:02 : featureDF hft_ctx_w21_dc1r3_r1, Class = DFrame
+DataFrame with 6062095 rows and 3 columns
+        seqnames     idx     start
+           <Rle> <array>   <array>
+1           chr1       1         0
+2           chr1       2       500
+3           chr1       3      1000
+4           chr1       4      1500
+5           chr1       5      2000
+...          ...     ...       ...
+6062091     chrX  312078 156038500
+6062092     chrX  312079 156039000
+6062093     chrX  312080 156039500
+6062094     chrX  312081 156040000
+6062095     chrX  312082 156040500
+        seqnames     idx     start
+           <Rle> <array>   <array>
+1           chr1       1         0
+2           chr1       2       500
+3           chr1       3      1000
+4           chr1       4      1500
+5           chr1       5      2000
+...          ...     ...       ...
+6062091     chrX  312078 156038500
+6062092     chrX  312079 156039000
+6062093     chrX  312080 156039500
+6062094     chrX  312081 156040000
+6062095     chrX  312082 156040500
+
+
+        seqnames     idx     start
+           <Rle> <array>   <array>
+1           chr1       1         0
+2           chr1       2       500
+3           chr1       3      1000
+4           chr1       4      1500
+5           chr1       5      2000
+...          ...     ...       ...
+6062091     chrX  312078 156038500
+6062092     chrX  312079 156039000
+6062093     chrX  312080 156039500
+6062094     chrX  312081 156040000
+6062095     chrX  312082 156040500
+
+2023-06-12 16:39:04 : Getting TileMatrix from ArrowFile : hft_ctx_w21_dc1r3_r1.arrow, 0.058 mins elapsed.
+2023-06-12 16:39:04 : Getting TileMatrix from ArrowFile : hft_ctx_w21_dc2r2_r1.arrow, 0.058 mins elapsed.
+2023-06-12 16:39:04 : Getting TileMatrix from ArrowFile : hft_ctx_w21_dc2r2_r2.arrow, 0.058 mins elapsed.
+
+2023-06-12 16:40:04 : mat hft_ctx_w21_dc2r2_r2, Class = dgCMatrix
+mat hft_ctx_w21_dc2r2_r2: nRows = 6062095, nCols = 2326
+mat hft_ctx_w21_dc2r2_r2: NonZeroEntries = 31800106, EntryRange = [ 1 , 25 ]
+5 x 5 sparse Matrix of class "dgCMatrix"
+     hft_ctx_w21_dc2r2_r2#ACTTGAATCCGGTTGA-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+     hft_ctx_w21_dc2r2_r2#GCGTAACGTTAGACCA-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+     hft_ctx_w21_dc2r2_r2#GAAGGCTAGACCATAC-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+     hft_ctx_w21_dc2r2_r2#TCAGTAATCTAGCGTG-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+     hft_ctx_w21_dc2r2_r2#CTGGTTACACAACAAA-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+
+
+2023-06-12 16:40:05 : Organizing SE TileMatrix from ArrowFile : hft_ctx_w21_dc2r2_r2.arrow, 1.083 mins elapsed.
+
+2023-06-12 16:40:05 : mat hft_ctx_w21_dc1r3_r1, Class = dgCMatrix
+mat hft_ctx_w21_dc1r3_r1: nRows = 6062095, nCols = 3033
+mat hft_ctx_w21_dc1r3_r1: NonZeroEntries = 37677472, EntryRange = [ 1 , 27 ]
+
+2023-06-12 16:40:06 : se hft_ctx_w21_dc2r2_r2, Class = SummarizedExperiment
+class: SummarizedExperiment 
+dim: 6062095 2326 
+metadata(0):
+assays(1): TileMatrix
+rownames: NULL
+rowData names(3): seqnames idx start
+colnames(2326): hft_ctx_w21_dc2r2_r2#ACTTGAATCCGGTTGA-1
+  hft_ctx_w21_dc2r2_r2#GCGTAACGTTAGACCA-1 ...
+  hft_ctx_w21_dc2r2_r2#TGCGGTTCATTATGGT-1
+  hft_ctx_w21_dc2r2_r2#CGTCAATAGCGCAATT-1
+colData names(21): BlacklistRatio DoubletEnrichment ... seurat_clusters
+  celltype
+
+2023-06-12 16:40:06 : Completed TileMatrix : hft_ctx_w21_dc2r2_r2(2 of 3), 1.106 mins elapsed.
+5 x 5 sparse Matrix of class "dgCMatrix"
+     hft_ctx_w21_dc1r3_r1#AAGGTGCAGGCGGGTA-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+     hft_ctx_w21_dc1r3_r1#TCTGGCTTCGCTAGCA-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+     hft_ctx_w21_dc1r3_r1#TCATTTGGTCTAACAG-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+     hft_ctx_w21_dc1r3_r1#TGTAACTCAATTGAGA-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+     hft_ctx_w21_dc1r3_r1#GCTAACCCAATCCTGA-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+
+
+2023-06-12 16:40:06 : Organizing SE TileMatrix from ArrowFile : hft_ctx_w21_dc1r3_r1.arrow, 1.1 mins elapsed.
+
+2023-06-12 16:40:07 : se hft_ctx_w21_dc1r3_r1, Class = SummarizedExperiment
+class: SummarizedExperiment 
+dim: 6062095 3033 
+metadata(0):
+assays(1): TileMatrix
+rownames: NULL
+rowData names(3): seqnames idx start
+colnames(3033): hft_ctx_w21_dc1r3_r1#AAGGTGCAGGCGGGTA-1
+  hft_ctx_w21_dc1r3_r1#TCTGGCTTCGCTAGCA-1 ...
+  hft_ctx_w21_dc1r3_r1#ACTTTGTTCCTAAGAC-1
+  hft_ctx_w21_dc1r3_r1#TCTCCTCGTTCACCCA-1
+colData names(21): BlacklistRatio DoubletEnrichment ... seurat_clusters
+  celltype
+
+2023-06-12 16:40:07 : Completed TileMatrix : hft_ctx_w21_dc1r3_r1(3 of 3), 1.12 mins elapsed.
+
+2023-06-12 16:40:15 : mat hft_ctx_w21_dc2r2_r1, Class = dgCMatrix
+mat hft_ctx_w21_dc2r2_r1: nRows = 6062095, nCols = 3333
+mat hft_ctx_w21_dc2r2_r1: NonZeroEntries = 52124512, EntryRange = [ 1 , 30 ]
+5 x 5 sparse Matrix of class "dgCMatrix"
+     hft_ctx_w21_dc2r2_r1#GGTTGAGCAGCTAATT-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+     hft_ctx_w21_dc2r2_r1#AAGGTATAGGAACGGT-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+     hft_ctx_w21_dc2r2_r1#TATGACTCACCATATG-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+     hft_ctx_w21_dc2r2_r1#ATTAGTCCAATCCTAG-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+     hft_ctx_w21_dc2r2_r1#GATTGGTTCGATTTAG-1
+[1,]                                       .
+[2,]                                       .
+[3,]                                       .
+[4,]                                       .
+[5,]                                       .
+
+
+2023-06-12 16:40:16 : Organizing SE TileMatrix from ArrowFile : hft_ctx_w21_dc2r2_r1.arrow, 1.261 mins elapsed.
+
+2023-06-12 16:40:16 : se hft_ctx_w21_dc2r2_r1, Class = SummarizedExperiment
+class: SummarizedExperiment 
+dim: 6062095 3333 
+metadata(0):
+assays(1): TileMatrix
+rownames: NULL
+rowData names(3): seqnames idx start
+colnames(3333): hft_ctx_w21_dc2r2_r1#GGTTGAGCAGCTAATT-1
+  hft_ctx_w21_dc2r2_r1#AAGGTATAGGAACGGT-1 ...
+  hft_ctx_w21_dc2r2_r1#TATCGCGAGTGAAGTG-1
+  hft_ctx_w21_dc2r2_r1#CTTGTAAAGTATTGTG-1
+colData names(21): BlacklistRatio DoubletEnrichment ... seurat_clusters
+  celltype
+
+2023-06-12 16:40:16 : Completed TileMatrix : hft_ctx_w21_dc2r2_r1(1 of 3), 1.276 mins elapsed.
+2023-06-12 16:40:18 : Organizing colData, 1.308 mins elapsed.
+2023-06-12 16:40:18 : Organizing rowData, 1.309 mins elapsed.
+2023-06-12 16:40:18 : Organizing rowRanges, 1.312 mins elapsed.
+2023-06-12 16:40:18 : Organizing Assays (1 of 1), 1.312 mins elapsed.
+2023-06-12 16:40:20 : Constructing SummarizedExperiment, 1.347 mins elapsed.
+2023-06-12 16:40:21 : Finished Matrix Creation, 1.353 mins elapsed.

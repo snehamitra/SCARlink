@@ -100,7 +100,6 @@ def read_sparse_significance(f, k, entry):
 
 # write z-scores and p-values in sparse format
 def write_significance(f, k, z, p):
-    del f[k]
     g = f.create_group(k)
     clusters, df_z = sparsify_df(z)
     clusters, df_p = sparsify_df(p, logneg=True)

@@ -1,16 +1,22 @@
+import argparse
 from rpy2.robjects.packages import STAP
-import sys
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--scrna', required=True, type=str)
+    parser.add_argument('--scatac', required=True, type=str)
+    parser.add_argument('-o', '--outdir', required=True, type=str)
+    args = parser.parse_args()
+
     rscript_dir = '/'.join(__file__.split('/')[:-1]) + '/'
     with open(rscript_dir+'read_seurat_archr.R', 'r') as f:
         string = f.read()
     rfunc = STAP(string, "rfunc")
     
-    archr_out = (sys.argv)[1]
-    seurat_out = (sys.argv)[2]
-    out_dir = (sys.argv)[3]
-
+    archr_out = args.scatac
+    seurat_out = args.scrna
+    out_dir = args.outdir
+    out_dir = out_dir + '/' if out_dir[-1] != '/' else out_dir
     rfunc.write_files(archr_out, seurat_out, out_dir)
     
 if __name__ == '__main__':
