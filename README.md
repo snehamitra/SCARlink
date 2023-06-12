@@ -8,7 +8,7 @@ Single-cell ATAC+RNA linking (SCARlink) uses multiomic single-cell ATAC and RNA 
 </div>
 
 
-### Installation 
+## Installation 
 
 To install SCARlink first create a conda environment:
 
@@ -42,25 +42,25 @@ git clone https://github.com/snehamitra/SCARlink.git
 pip install -e SCARlink
 ```
 
-### Usage
+## Usage
 
 SCARlink requires preprocessed scRNA-seq in a Seurat object and scATAC-seq in ArchR object. The cell names in both the objects need to be identical. Please refer to the example notebook for generating Seurat and ArchR objects.
 
-##### 1. Preprocessing
+#### 1. Preprocessing
 Run `scarlink_preprocessing` to generate `coasssay_matrix.h5` to use as input to SCARlink.
 
 ```
 scarlink_processing --scrna scrna_seurat.rds --scatac scatac_archr -o multiome_out
 ```
 
-##### 2. Running locally
+#### 2. Running locally
 For small data sets with few genes, run SCARlink sequentially on the gene set in the same output directory `multiome_out`, as before, for all the remaining steps. Note that `celltype` needs to be present in either `scrna_seurat.rds` or `scatac_archr`.
 
 ```
 scarlink -o multiome_out -g hg38 -c celltype
 ```
 
-##### 2a. Running locally without cell type information during training and computing cell type scores afterwards
+#### 2a. Running locally without cell type information during training and computing cell type scores afterwards
 SCARlink can also be run without providing cell type information using `-c`. In that case SCARlink only computes the gene-level regression model and does not estimate cell-type-specific Shapley values. 
 
 ```
@@ -73,14 +73,14 @@ The cell-type-specific Shapley scores can be computed later on by running `scarl
 scarlink -o multiome_out -g hg38 -c celltype
 ```
 
-##### 2b. Running locally with different cell type grouping
+#### 2b. Running locally with different cell type grouping
 SCARlink can be run again with a different cell type annotation. For example, more granular annotations. Both `celltype` and `celltype_granular` scores would be retained.
 
 ```
 scarlink -o multiome_out -g hg38 -c celltype_granular
 ```
 
-##### 2c. Running on cluster by parallelizing over gene set
+#### 2c. Running on cluster by parallelizing over gene set
 To speed up computation, SCARlink can be run on a cluster in parallel. By default it parallelizes over 100 cores, `-np 100` when `-np` is not provided. 
 ```bash
 scarlink -o multiome_out -g hg38 -c celltype -p $LSB_JOBINDEX
