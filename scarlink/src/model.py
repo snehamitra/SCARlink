@@ -19,8 +19,8 @@ from sklearn.preprocessing import MaxAbsScaler
 from sklearn.model_selection import RepeatedKFold, train_test_split
 import tensorflow.keras.backend as K
 from scarlink.src.plotExtra import plotRegion, get_fragment_counts, plot_hist, create_colormap
-from scarlink.src.read_h5_and_group_cells import construct_cell_info, construct_gex_mat, get_train_test_split, get_gene_tile_matrix_group_cells
-from scarlink.src.tile_significance import set_gene_tile_significance, set_gene_tile_significance_bootstrapped, set_gene_tile_significance_new_corr
+from scarlink.src.read_h5_and_group_cells import construct_cell_info, construct_gex_mat, get_train_test_split, get_gene_tile_matrix_group_cells, write_significance, read_sparse_significance
+from scarlink.src.tile_significance import set_gene_tile_significance_bootstrapped, set_gene_tile_significance_signed_rank
 
 warnings.filterwarnings('ignore', category=NaturalNameWarning)
 matplotlib.rcParams['pdf.fonttype'] = 42
@@ -114,24 +114,53 @@ class RegressionModel:
         return corr, pval
 
     def get_gene_tile_significance(self, gene, celltype_col):
+        clusters = sorted(self.cell_info[celltype_col].unique().tolist())
+        k = 'tile_significance/' + celltype_col + '/' + gene
         f = h5py.File(self.output_dir + self.out_file, mode = 'r')
-        z_d = self.compute_gene_tile_significance(gene, celltype_col)
-        dfs = []
+        m_z = read_sparse_significance(f, k, 'z-score')
+        m_p = read_sparse_significance(f, k, 'p-value')
+        df_z = pandas.DataFrame(m_z.todense(), columns=clusters)
+        df_p = pandas.DataFrame(10**(-np.array(m_p.todense())), columns=clusters)
         tiles = self.input_file_handle.select(gene + '/tile_info')
-        for c in z_d:
-            c_df = pandas.DataFrame(columns=['chr', 'start', 'end', celltype_col, 'z-score'])
-            c_df['chr'] = tiles['seqnames']
-            c_df['start'] = tiles['start'].astype(int)
-            c_df['end'] = tiles['end'].astype(int)
-            c_df[celltype_col] = c
-            c_df['z-score'] = z_d[c]
-            dfs.append(c_df)
-        df = pandas.concat(dfs, axis=0)
-        df['gene'] = gene
-        f.close()
-        return df
+        tiles = tiles[['seqnames', 'start', 'end']].rename(columns={'seqnames': 'chr'})
+        df_z = pandas.concat([df_z, tiles], axis=1)
+        df_z_long = pandas.melt(df_z, id_vars=['chr', 'start', 'end'], value_vars=clusters,
+                                var_name=celltype_col, value_name='z-score')
+        df_p = pandas.concat([df_p, tiles], axis=1)
+        df_p_long = pandas.melt(df_p, id_vars=['chr', 'start', 'end'], value_vars=clusters,
+                                var_name=celltype_col, value_name='p-value')
 
+        df = df_z_long.merge(df_p_long, on=['chr', 'start', 'end']+[celltype_col])
+        df['gene'] = gene
+        return df
+    
     def compute_gene_tile_significance(self, gene, celltype_col):
+        f = h5py.File(self.output_dir + self.out_file, mode = 'a')
+        # if 'tile_significance/' + celltype_col + '/' + gene in f.keys():
+        #     f.close()
+        #     return
+        z_d = self.compute_gene_tile_significance_shap(gene, celltype_col)
+        p_d = self.compute_gene_tile_significance_signed_rank(gene, celltype_col, z_d)
+        write_significance(f, "tile_significance/" + celltype_col + '/' + gene, z_d, p_d)
+        f.close()
+        return
+        # dfs = []
+        # tiles = self.input_file_handle.select(gene + '/tile_info')
+        # for c in z_d:
+        #     c_df = pandas.DataFrame(columns=['chr', 'start', 'end', celltype_col, 'z-score'])
+        #     c_df['chr'] = tiles['seqnames']
+        #     c_df['start'] = tiles['start'].astype(int)
+        #     c_df['end'] = tiles['end'].astype(int)
+        #     c_df[celltype_col] = c
+        #     c_df['z-score'] = z_d[c]
+        #     dfs.append(c_df)
+        # df = pandas.concat(dfs, axis=0)
+        # df['gene'] = gene
+        # f.close()
+        # return df
+
+    
+    def compute_gene_tile_significance_shap(self, gene, celltype_col):
         f = h5py.File(self.output_dir + self.out_file, mode = 'r')
         w_mat = np.array(f['genes/' + gene][:])
         e = np.array([f['genes/' + gene].attrs['intercept']])
@@ -143,6 +172,19 @@ class RegressionModel:
         z_d = set_gene_tile_significance_bootstrapped(x, np.ravel(gex_train.todense()), w_mat, e, self.cell_info.iloc[self.train_ix], celltype_col)
         f.close()
         return z_d 
+
+    def compute_gene_tile_significance_signed_rank(self, gene, celltype_col, z_d):
+        f = h5py.File(self.output_dir + self.out_file, mode = 'r')
+        w_mat = np.array(f['genes/' + gene][:])
+        e = np.array([f['genes/' + gene].attrs['intercept']])
+        train_alpha = float(f['genes/' + gene].attrs['alpha'])
+        gex_train, gex_test = self.get_gex_gene(gene)
+        tile_gene_mat_train, tile_gene_mat_test = self.gene_tile_matrix_scaled(gene,
+                        normalization_factor='ReadsInTSS')
+        x = np.array(tile_gene_mat_test.todense())
+        p_d = set_gene_tile_significance_signed_rank(x, np.ravel(gex_test.todense()), w_mat, e, self.cell_info.iloc[self.test_ix], celltype_col, z_d)
+        f.close()
+        return p_d 
 
     def build_model(self, atac_shape, a):
         # regression framework
@@ -337,7 +379,7 @@ class RegressionModel:
         print("Spearman correlation on held out test set:", f['genes/' + gene].attrs['spearman_correlation_test'])
 
         if plot_pval:
-            zscore_d = self.compute_gene_tile_significance(gene, groups)
+            zscore_d = self.compute_gene_tile_significance_shap(gene, groups)
             min_pvals = 0
             max_pvals = np.round(np.percentile(list(zscore_d.values()), 99)) # 6
         f.close()

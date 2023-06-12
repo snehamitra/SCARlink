@@ -20,7 +20,7 @@ def main():
     else: slurm_ix = None
 
     celltype_col = 'celltype'
-    
+
     rm = RegressionModel(input_file, output_dir, gtf_file=gtf_file, out_file_name = 'coefficients_' + str(slurm_ix) + '.hd5', group_cells = False)
     if slurm_ix is None:
         gene_names = rm.gene_names
@@ -29,6 +29,8 @@ def main():
 
     for gene in gene_names:
         rm.train_test_model(gene, normalization_factor = 'ReadsInTSS', force = False, epochs = 20, verbose = False) 
-        
+        if celltype_col is not None and rm.check_if_calculated(gene):
+            z = rm.compute_gene_tile_significance(gene, celltype_col)
+            
 if __name__ == '__main__':
     main()

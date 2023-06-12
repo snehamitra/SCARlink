@@ -72,3 +72,42 @@ def get_gene_tile_matrix_group_cells(f, gene, group_cells):
     for i in range(1, cells.shape[0]):
         group_tile_gene_mat += tile_gene_mat[cells[i]]
     return group_tile_gene_mat
+
+# take dictionary of z-scores/p-values and create sparse data frame
+def sparsify_df(d, logneg=False):
+    clusters = sorted(list(d.keys()))
+    df = pandas.DataFrame(columns=clusters)
+    for ky in d:
+        df[ky] = d[ky]
+    if logneg:
+        df = np.log10(df).abs()
+    else:
+        df[df < 0] = 0
+
+    return df.columns, csr_matrix(df.values)
+
+def write_sparse_significance(f, df, k):
+    g = f.create_group(k)
+    g.create_dataset('data', data=df.data)
+    g.create_dataset('indptr', data=df.indptr)
+    g.create_dataset('indices', data=df.indices)
+    g.attrs['shape'] = df.shape
+
+def read_sparse_significance(f, k, entry):
+    g = f[k + '/' + entry]
+    m = csr_matrix((g['data'][:], g['indices'][:], g['indptr'][:]), g.attrs['shape'])
+    return m
+
+# write z-scores and p-values in sparse format
+def write_significance(f, k, z, p):
+    del f[k]
+    g = f.create_group(k)
+    clusters, df_z = sparsify_df(z)
+    clusters, df_p = sparsify_df(p, logneg=True)
+
+    write_sparse_significance(f, df_z, k+'/z-score')
+    write_sparse_significance(f, df_p, k+'/p-value')
+    
+    sparse_z = read_sparse_significance(f, k, entry='z-score')
+    sparse_p = read_sparse_significance(f, k, entry='p-value')
+
