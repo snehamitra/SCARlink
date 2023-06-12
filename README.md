@@ -20,7 +20,7 @@ conda activate scarlink-env
 Install essential R packages
 
 ```
-conda install -c conda-forge r-seurat r-irkernel r-devtools r-biocmanager
+conda install -c conda-forge r-seurat r-devtools r-biocmanager
 conda install -c bioconda bioconductor-rhdf5 \
                      bioconductor-chromvar \
                      bioconductor-motifmatchr \
@@ -86,7 +86,8 @@ To speed up computation, SCARlink can be run on a cluster in parallel. By defaul
 scarlink -o multiome_out -g hg38 -c celltype -p $LSB_JOBINDEX
 ```
 
-#### 3. Get FDR corrected gene-linked tiles.
+#### 3. Get FDR corrected gene-linked tiles
+Get table with tile-level siginificance for each gene and celltype.
 ```bash
 scarlink_tiles -o multiome_out -c celltype 
 ```
