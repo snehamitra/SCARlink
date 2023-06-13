@@ -1,3 +1,5 @@
+import os
+os.environ['KMP_WARNINGS'] = 'off'
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas 
@@ -10,6 +12,11 @@ import scipy
 import sklearn.neighbors
 from sklearn.cluster import AgglomerativeClustering
 from scarlink.src.get_smoothed_pred_obs import smooth_vals
+import warnings
+warnings.filterwarnings("ignore", message="Transforming to str index.")
+warnings.filterwarnings("ignore", message="An input array is constant; the correlation coefficient is not defined.") 
+# warnings.filterwarnings("ignore", message="No data for colormapping provided via 'c'. Parameters 'cmap' will be ignored invalid value encountered in divide") 
+warnings.filterwarnings( "ignore", module = "matplotlib\..*" )
 
 def create_object(dirname, smooth_k=50, remove_celltype='', celltype_col='celltype', umap_file=''):
     cell_info_file = dirname + '/cell_info.txt'
@@ -18,11 +25,12 @@ def create_object(dirname, smooth_k=50, remove_celltype='', celltype_col='cellty
     lsi = pandas.read_csv(lsi_file, sep='\t').values
     yp, yo = smooth_vals(out_dir, lsi, smooth_k)
     cell_info = pandas.read_csv(cell_info_file, sep="\t")
+
+    yp.index = yp.index.astype(str)
+    yo.index = yo.index.astype(str)
     
     adata_pred = ad.AnnData(yp)
     adata_obs = ad.AnnData(yo)
-    adata_pred.obs.index = adata_pred.obs.index.astype(str)
-    adata_obs.obs.index = adata_pred.obs.index.astype(str)
     adata_pred.obs = cell_info
     adata_obs.obs = cell_info
 
@@ -57,12 +65,12 @@ def cluster_genes(d, n_clust=2):
     adata.obs.index = adata.obs.index.astype(str)
     adata.obs = cell_info
     
-    model = AgglomerativeClustering(n_clusters=n_clust, affinity='cosine', linkage='complete') 
+    model = AgglomerativeClustering(n_clusters=n_clust, metric='cosine', linkage='complete') 
     yhat = model.fit_predict(sklearn.preprocessing.MinMaxScaler().fit_transform(adata.X).T)
     adata.var['hierarchical'] = pandas.Categorical([str(int(x)) for x in yhat])
     
-    adata_o = d['obs'][:, np.argsort(adata.var['hierarchical'])].copy()
-    adata_o = adata_o[np.argsort(adata_o.obs[d['celltype_col']]), :]
+    adata_o = d['obs'][:, np.argsort(adata.var['hierarchical'])]
+    adata_o = adata_o[np.argsort(adata_o.obs[d['celltype_col']]), :].copy()
     sc.pp.normalize_total(adata_o)
     sc.pp.scale(adata_o)
     uniq_c = adata.var['hierarchical'].unique()
@@ -71,8 +79,8 @@ def cluster_genes(d, n_clust=2):
         var_names[c] = adata.var_names[adata.var['hierarchical'] == c].tolist()
         
     sc.pl.heatmap(adata_o, var_names=var_names, 
-              groupby=d['celltype_col'], cmap='plasma', 
-             figsize=(3, 10), standard_scale='obs')
+                  groupby=d['celltype_col'], cmap='plasma', show_gene_labels=False,
+                  figsize=(3, 10), standard_scale='obs')
     return var_names
 
 def filter_genes(d, batch, genes):
