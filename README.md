@@ -28,11 +28,10 @@ conda install -c bioconda bioconductor-rhdf5 \
                      bioconductor-complexheatmap
 ```
 
-Install ArchR in the conda environment
+Install ArchR in the conda environment inside R
 
 ``` r
-devtools::install_github("GreenleafLab/ArchR", ref="master", \
-			repos = BiocManager::repositories())
+devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())
 ```
 
 Download SCARlink from GitHub and install
