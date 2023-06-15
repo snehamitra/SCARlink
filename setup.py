@@ -6,7 +6,7 @@ config = {
     'version': '0.0.1',
     'packages': ['scarlink'],
     'setup_requires': [],
-    'install_requires': ['tensorflow==2.11.0',
+    'install_requires': [#'tensorflow==2.11.0',
                          'shap==0.41.0',
                          'tables==3.7.0',
                          'scikit-learn==1.2.1',
@@ -18,6 +18,7 @@ config = {
     'entry_points': {'console_scripts': [
         'scarlink = scarlink.run_scarlink:main',
         'scarlink_tiles = scarlink.run_scarlink_tiles:main',
+        'scarlink_plot = scarlink.run_scarlink_visualization:main',
         'scarlink_processing = scarlink.preprocessing.create_h5_files:main']}
 }
 

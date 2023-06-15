@@ -86,3 +86,4 @@ def create_colormap(clusters):
     random.shuffle(cmap)
     cmap = dict(zip(clusters, cmap))
     return cmap
+

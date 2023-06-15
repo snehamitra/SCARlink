@@ -340,7 +340,7 @@ class RegressionModel:
         end = int(f['genes/' + gene].attrs['end'])
         return chrm, start, end
     
-    def plot_gene(self, gene, groups = 'Clusters', plot_frags = False, output_header = 'figures', to_save = False, cmap = None, save_format='png', figsize=(17, 14), sort_gex=False, show_yticks=False, plot_shap=False, shap_cmap='Blues', pvals_cmap='Blues', cluster_order=[], tilesize=500, plot_pval=False, bg_transparent=False):
+    def plot_gene(self, gene, groups = 'Clusters', plot_frags = False, output_header = 'figures', to_save = False, plot_dir='', cmap = None, save_format='png', figsize=(17, 14), sort_gex=False, show_yticks=False, plot_shap=False, shap_cmap='Blues', pvals_cmap='Blues', cluster_order=[], tilesize=500, plot_pval=False, bg_transparent=False):
         if cmap is None:
             if len(cluster_order) == 0:
                 clusters = sorted(list(set(self.cell_info.dropna()[groups])))
@@ -361,7 +361,7 @@ class RegressionModel:
         start = int(f['genes/' + gene].attrs['start'])
         end = int(f['genes/' + gene].attrs['end'])
         sp_corr = f['genes/' + gene].attrs['spearman_correlation_test']
-        print("Spearman correlation on held out test set:", f['genes/' + gene].attrs['spearman_correlation_test'])
+        # print("Spearman correlation on held out test set:", f['genes/' + gene].attrs['spearman_correlation_test'])
 
         if plot_pval:
             zscore_d = self.compute_gene_tile_significance_shap(gene, groups)
@@ -464,8 +464,10 @@ class RegressionModel:
 
         plt.suptitle(gene + "(corr : " + str(round(sp_corr, 4)) + ")", fontsize = 'xx-large')
         if to_save:
-            os.makedirs(self.output_dir + '/' + output_header + '/', exist_ok = True)
-            plt.savefig(self.output_dir + '/' + output_header + '/' + gene + '.' + save_format, transparent=bg_transparent)
-            plt.close()
-            print("Saved as " + self.output_dir + '/' + output_header + '/' + gene + '.' + save_format) 
+            # os.makedirs(self.output_dir + '/' + output_header + '/', exist_ok = True)
+            # plt.savefig(self.output_dir + '/' + output_header + '/' + gene + '.' + save_format, transparent=bg_transparent)
+            # os.makedirs(self.output_dir, exist_ok = True)
+            plt.savefig(plot_dir + gene + '.' + save_format, transparent=bg_transparent)
+            # plt.close()
+            print("Saved as " + plot_dir + gene + '.' + save_format) 
         

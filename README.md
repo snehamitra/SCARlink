@@ -93,3 +93,9 @@ scarlink_tiles -o multiome_out -c celltype
 
 #### 4. Chromatin potential
 Chromatin potential analysis can be performed after running steps 1 and 2. Please refer to [example notebook](https://github.com/snehamitra/SCARlink_private/blob/main/notebooks/chromatin_potential.ipynb).
+
+#### 5. Plot SCARlink output
+SCARlink can create visualizations for the chromatin accessibility around a gene (250kb upstream and downstream of the gene body) and the gene expression for a given gene, grouped by user-provided celltype. The visualizations can help understand the connection between the accessibility at tile-level to gene expression. Note that SCARlink can generate visualizations for different cell type groupings on the fly. Example visulizations are provided in a [notebook](https://github.com/snehamitra/SCARlink_private/blob/main/notebooks/output_visualization.ipynb). The visualizations can also be generated at the command line.
+```bash
+scarlink_tiles -o multiome_out -c celltype --genes GENE1,GENE2
+```
