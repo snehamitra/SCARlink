@@ -2,7 +2,7 @@
 
 Preprint available on [bioRxiv](https://www.biorxiv.org/content/10.1101/2023.06.13.544851v1).
 
-*Documentation coming soon.*
+*Documentation coming soon!*
 
 Single-cell ATAC+RNA linking (SCARlink) uses multiomic single-cell ATAC and RNA to predict gene expression from chromatin accessibility and predict regulatory regions. It uses tile-based chromatin accessibity data from a genomic locus (+/-250kb flanking gene body) and applies regularized Poisson regression to predict gene expression. The learned regression coefficients of the tiles are informative of regulatory regions in a gene-specific manner. The regression model by itself is cell-type-agnostic. Shapley values computed by grouping cells provide insight into the regulatory regions in a cell-type specific manner. Therefore, the trained regression model can be used multiple times to identify important tiles for different groupings without retraining.
 
