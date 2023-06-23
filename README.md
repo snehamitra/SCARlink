@@ -14,7 +14,11 @@ Single-cell ATAC+RNA linking (SCARlink) uses multiomic single-cell ATAC and RNA 
 
 ## Installation 
 
-To install SCARlink first create a conda environment:
+It is optional to install SCARlink in a conda environment that also has R packages Seurat v4 and ArchR installed. If you already have the R packages installed and want to run SCARlink without conda, jump directly to step 2 of installation.
+
+#### 1. Conda setup
+
+To install SCARlink within conda, first create a conda environment:
 
 ``` python
 conda create -n scarlink-env python=3.8
@@ -45,6 +49,8 @@ Install ArchR in the conda environment inside R
 ``` r
 devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())
 ```
+
+#### 2. SCARlink installation
 
 Download SCARlink from GitHub and install
 
