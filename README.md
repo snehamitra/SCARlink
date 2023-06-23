@@ -21,6 +21,14 @@ conda create -n scarlink-env python=3.8
 conda activate scarlink-env
 ```
 
+Set the priority of conda channels
+
+```
+conda config --add channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
+```
+
 Install essential R packages
 
 ```
