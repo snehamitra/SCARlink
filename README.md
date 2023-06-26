@@ -61,7 +61,7 @@ pip install -e SCARlink
 
 ## Usage
 
-SCARlink requires preprocessed scRNA-seq in a Seurat object and scATAC-seq in ArchR object. The cell names in both the objects need to be identical. Please refer to the [example notebook](https://github.com/snehamitra/SCARlink_private/blob/main/notebooks/preprocessing_scRNA_scATAC.ipynb) for generating Seurat and ArchR objects.
+SCARlink requires preprocessed scRNA-seq (CPM normalized counts) in a Seurat object and scATAC-seq (non-binary tile matrix) in ArchR object. The cell names in both the objects need to be identical. Please refer to the [example notebook](https://github.com/snehamitra/SCARlink_private/blob/main/notebooks/preprocessing_scRNA_scATAC.ipynb) for generating Seurat and ArchR objects.
 
 #### 1. Preprocessing
 Run `scarlink_preprocessing` to generate `coasssay_matrix.h5` to use as input to SCARlink.
