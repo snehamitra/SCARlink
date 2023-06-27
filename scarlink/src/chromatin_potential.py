@@ -131,7 +131,7 @@ def smooth_arrows(x, y, u, v, smooth_w=50, min_count=5, take_top=0):
     Ey_ms = np.array(Ey_ms)
     return x_ms, y_ms, Ex_ms, Ey_ms
 
-def myvelocity_paper(d, pred_key='y_pred_scaled_filtered', 
+def calc_velocity(d, pred_key='y_pred_scaled_filtered', 
                      obs_key='y_obs_scaled_filtered', max_per_cell=10, pseudo_count=1, 
                      remove_zeros=False, umap_key='umap', metric='correlation', batch=None):
     yp = d[pred_key].values 
@@ -239,7 +239,7 @@ def chrom_pot(d_orig, batch=None, umap_key='umap', max_per_cell=10,
 
     d[pred_filtered_key] = pandas.DataFrame(yp[:, idx], columns=d['pred'].var_names[idx])
     d[obs_filtered_key] = pandas.DataFrame(yo[:, idx], columns=d['obs'].var_names[idx])
-    x, v, M = myvelocity_paper(d, pred_key=pred_filtered_key, 
+    x, v, M = calc_velocity(d, pred_key=pred_filtered_key, 
                      obs_key=obs_filtered_key, umap_key=umap_key, batch=batch, max_per_cell=max_per_cell, 
                               metric=metric)
 
