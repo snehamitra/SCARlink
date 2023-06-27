@@ -61,7 +61,7 @@ class RegressionModel:
             g.attrs['scatac_fragment_file'] = os.path.abspath(self.scatac_fragment_file)
             
         f.close()
-        
+
     def gene_tile_matrix(self, gene):
         tile_gene_mat = get_gene_tile_matrix_group_cells(self.input_file_handle, gene, self.group_cells)
         return tile_gene_mat
@@ -361,7 +361,6 @@ class RegressionModel:
         start = int(f['genes/' + gene].attrs['start'])
         end = int(f['genes/' + gene].attrs['end'])
         sp_corr = f['genes/' + gene].attrs['spearman_correlation_test']
-        # print("Spearman correlation on held out test set:", f['genes/' + gene].attrs['spearman_correlation_test'])
 
         if plot_pval:
             zscore_d = self.compute_gene_tile_significance_shap(gene, groups)
@@ -464,10 +463,6 @@ class RegressionModel:
 
         plt.suptitle(gene + "(corr : " + str(round(sp_corr, 4)) + ")", fontsize = 'xx-large')
         if to_save:
-            # os.makedirs(self.output_dir + '/' + output_header + '/', exist_ok = True)
-            # plt.savefig(self.output_dir + '/' + output_header + '/' + gene + '.' + save_format, transparent=bg_transparent)
-            # os.makedirs(self.output_dir, exist_ok = True)
             plt.savefig(plot_dir + gene + '.' + save_format, transparent=bg_transparent)
-            # plt.close()
             print("Saved as " + plot_dir + gene + '.' + save_format) 
         
