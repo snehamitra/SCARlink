@@ -109,7 +109,7 @@ class RegressionModel:
 
 
     def find_correlation_spearman(self, model, x, y):
-        y_pred = model.predict(x)
+        y_pred = model.predict(x, verbose=None)
         corr, pval = stats.spearmanr(y, y_pred)
         return corr, pval
 
@@ -214,7 +214,7 @@ class RegressionModel:
                 opt = tf.keras.optimizers.Adam(learning_rate=0.001, epsilon = 1)
                 model_custom = self.build_model(atac_train.shape[1], a)
                 model_custom.compile(optimizer=opt, loss='poisson')
-                hist = model_custom.fit(x=atac_train, y=rna_train, validation_data=(atac_test, rna_test), epochs=epochs, verbose=0)
+                hist = model_custom.fit(x=atac_train, y=rna_train, validation_data=(atac_test, rna_test), epochs=epochs, verbose=None)
                 if plot_loss: plot_hist(hist, "alpha: " + str(a)) 
                 s_corr, s_pval = self.find_correlation_spearman(model_custom, atac_test, rna_test)
                 s_corrs.append(s_corr)
@@ -228,13 +228,13 @@ class RegressionModel:
             s_corr = np.mean(s_corrs)
             testloss = np.mean(testlosses)
             w = np.mean(ws, axis = 0)
-            weights = self.get_model_weight_average(model_weights) # models)
+            weights = self.get_model_weight_average(model_weights) 
             
             if np.isnan(s_corr):
                 continue
-
+            
             if s_best_corr < s_corr:
-            # if testloss < best_testloss:
+                # if testloss < best_testloss:
                 best_testloss = testloss
                 params = a
                 s_best_corr = s_corr

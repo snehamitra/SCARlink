@@ -99,7 +99,17 @@ write_files <- function(archr_out, seurat_out, out_dir){
 	dir.create(out_dir, showWarnings = TRUE, recursive=TRUE)
     }
 
+    ### Make sure same cells are in both scrna.object and scatac.object
+    scatac.object <- scatac.object[scatac.object$cellNames %in% colnames(scrna.object), ]
+    scrna.object <- scrna.object[, colnames(scrna.object) %in% scatac.object$cellNames, ]
+
+    n_cells <- dim(scrna.object)[2]
+
     scatac.object <- scatac.object[match(colnames(scrna.object), scatac.object$cellNames), ]
+    if(n_cells==0){
+	stop("No cells in common between scATAC and scRNA objects. Please check the cell names")
+    }
+    print(paste(n_cells, "cells in common between scATAC and scRNA objects"))
 
     tm.filtered <- get_gene_tile_matrix(scatac.object, scrna.object)
     cell.info <- cbind(scrna.object@meta.data, as.data.frame(scatac.object@cellColData))

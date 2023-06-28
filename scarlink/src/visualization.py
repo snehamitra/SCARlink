@@ -34,7 +34,7 @@ def plot_scarlink_output(scarlink_out, genes, celltype):
 
         rm = read_model(scarlink_out['out_dir'], out_file_name=coef_file.split('/')[-1])
         rm.gtf_file = path + rm.gtf_file.split('/')[-1]
-        rm.plot_gene(gene, 'celltype', plot_dir=scarlink_out['plot_dir'],
+        rm.plot_gene(gene, celltype, plot_dir=scarlink_out['plot_dir'],
                      to_save=True,
                      save_format='pdf', sort_gex=True,
                      show_yticks=False, plot_pval=True)

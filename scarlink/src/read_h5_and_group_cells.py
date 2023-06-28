@@ -1,5 +1,6 @@
 #################################################################################
 # Read contents of h5 file and group cells if group_cells = True
+# group_cells feature is not included right now
 #################################################################################
 
 import h5py
@@ -8,10 +9,8 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from sklearn.model_selection import train_test_split
 
-#def add_df_rows(rows):
-    
 def construct_cell_info(f, group_cells):
-    cell_info = f.select('cell_info') # _annotated')
+    cell_info = f.select('cell_info') 
     if not group_cells:
         return cell_info
     train_cells = f.get_node('group_cells')['train'][:]
