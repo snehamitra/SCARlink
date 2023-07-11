@@ -117,6 +117,7 @@ class RegressionModel:
         clusters = sorted(self.cell_info[celltype_col].unique().tolist())
         k = 'tile_significance/' + celltype_col + '/' + gene
         f = h5py.File(self.output_dir + self.out_file, mode = 'r')
+        sp_corr = f['genes/' + gene].attrs['spearman_correlation_test']
         m_z = read_sparse_significance(f, k, 'z-score')
         m_p = read_sparse_significance(f, k, 'p-value')
         df_z = pandas.DataFrame(m_z.todense(), columns=clusters)
@@ -132,6 +133,7 @@ class RegressionModel:
 
         df = df_z_long.merge(df_p_long, on=['chr', 'start', 'end']+[celltype_col])
         df['gene'] = gene
+        df['Spearman corr'] = sp_corr
         return df
     
     def compute_gene_tile_significance(self, gene, celltype_col):
