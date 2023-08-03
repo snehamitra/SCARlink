@@ -40,7 +40,6 @@ conda install -c conda-forge r-seurat r-devtools r-biocmanager
 conda install -c bioconda bioconductor-rhdf5 \
                      bioconductor-chromvar \
                      bioconductor-motifmatchr \
-                     bioconductor-oncomix \
                      bioconductor-complexheatmap
 ```
 

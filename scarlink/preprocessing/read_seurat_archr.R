@@ -6,7 +6,6 @@
  
 library(ArchR)
 library(Seurat)
-library(oncomix)
 library(rhdf5)
 library(parallel)
 
