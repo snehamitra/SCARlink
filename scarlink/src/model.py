@@ -293,6 +293,7 @@ class RegressionModel:
         dset.attrs['chr'] = tiles.iloc[0]['seqnames']
         dset.attrs['start'] = tiles['start'].min()
         dset.attrs['end'] = tiles['end'].max()
+        dset.attrs['tilesize'] = tiles.iloc[0]['end'] - tiles.iloc[0]['start']
         dset.attrs['max_zero_fraction'] = max_zero_fraction
         dset.attrs['epochs'] = epochs
         dset.attrs['scATAC norm factor'] = normalization_factor
@@ -342,7 +343,7 @@ class RegressionModel:
         end = int(f['genes/' + gene].attrs['end'])
         return chrm, start, end
     
-    def plot_gene(self, gene, groups = 'Clusters', plot_frags = False, output_header = 'figures', to_save = False, plot_dir='', cmap = None, save_format='png', figsize=(17, 14), sort_gex=False, show_yticks=False, plot_shap=False, shap_cmap='Blues', pvals_cmap='Blues', cluster_order=[], tilesize=500, plot_pval=False, bg_transparent=False):
+    def plot_gene(self, gene, groups = 'Clusters', plot_frags = False, output_header = 'figures', to_save = False, plot_dir='', cmap = None, save_format='png', figsize=(17, 14), sort_gex=False, show_yticks=False, plot_shap=False, shap_cmap='Blues', pvals_cmap='Blues', cluster_order=[], plot_pval=False, bg_transparent=False):
         if cmap is None:
             if len(cluster_order) == 0:
                 clusters = sorted(list(set(self.cell_info.dropna()[groups])))
@@ -362,6 +363,7 @@ class RegressionModel:
         chrm = f['genes/' + gene].attrs['chr']
         start = int(f['genes/' + gene].attrs['start'])
         end = int(f['genes/' + gene].attrs['end'])
+        tilesize = int(f['genes/' + gene].attrs['tilesize'])
         sp_corr = f['genes/' + gene].attrs['spearman_correlation_test']
 
         if plot_pval:

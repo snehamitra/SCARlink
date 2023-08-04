@@ -6,3 +6,5 @@ scarlink.egg-info/
 *__pycache__
 ArchRLogs/
 scarlink_conda.txt
+*_bak.R
+*_bak.py

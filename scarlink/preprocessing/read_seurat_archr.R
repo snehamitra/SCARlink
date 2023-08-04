@@ -1,6 +1,6 @@
 ## Generates  coassay_matrix.h5
 ## Update file paths of variables archr_out, seurat_out, and out_dir
-## ArchR object should have TileMatrix (tile size: 500)
+## ArchR object should have non-binarized TileMatrix 
 ## The cell names in Seurat and ArchR objects need to be the same
 ## The script also saves the LSI matrix, KNN graph, and cell_info
  
@@ -10,17 +10,17 @@ library(rhdf5)
 library(parallel)
 
 ### FUNCTIONS
-get_gene_tile_matrix <- function(scatac.object, scrna.object){
+get_gene_tile_matrix <- function(scatac.object, scrna.object, window_size=250000){
 
-    # tile size set to 500
-    tile_size <- 500
+    # # tile size set to 500
+    # tile_size <- 500
 
     # get tile matrix for variable genes
     geneRegions <- getGenes(scatac.object)
     seqlevels(geneRegions) <- as.character(unique(seqnames(geneRegions)))
     geneRegions <- geneRegions[!is.na(mcols(geneRegions)$symbol)]
-    geneUpstream = 250000 
-    geneDownstream = 250000
+    geneUpstream = window_size 
+    geneDownstream = window_size
     geneRegions <- trim(extendGR(gr = geneRegions, upstream = geneUpstream, downstream = geneDownstream))
     geneRegions <- geneRegions[geneRegions$symbol %in% scrna.object$RNA@var.features, ]
 
@@ -31,6 +31,8 @@ get_gene_tile_matrix <- function(scatac.object, scrna.object){
 	binarize = FALSE)
     # reorder cells in tile matrix to match cell order in Seurat object
     tileGR <- rowData(tm)
+    tile_size <- tileGR$start[2] - tileGR$start[1]
+    print(paste("Tile size:", tile_size))
     tileGR$end <- tileGR$start + tile_size
     tileGR <- makeGRangesFromDataFrame(tileGR)
     tile.overlaps <- findOverlaps(tileGR, geneRegions)
@@ -55,6 +57,7 @@ write_hdf5 <- function(path, tile.matrix, gene)
     h5createGroup(path, group)
 
     tile.matrix.gene <- tile.matrix[rowData(tile.matrix)$symbol == gene, ]
+
     h5write(as.data.frame(rowData(tile.matrix.gene)), file=path, name=paste0(group, "/tile_info"))
 
     # Saving matrix information.
@@ -82,13 +85,13 @@ write_hdf5_rna <- function(path, scrna, genes)
     x <- scrna$RNA@data[genes, ]
     h5write(x@x, file=path, name=paste0(group, "/data"))
     h5write(dim(x), file=path, name=paste0(group, "/shape"))
-    h5write(x@i, file=path, name=paste0(group, "/indices")) # already zero-indexed.
+    h5write(x@i, file=path, name=paste0(group, "/indices")) # already zero-indexed
     h5write(x@p, file=path, name=paste0(group, "/indptr"))
 
     return(NULL)
 }
 
-write_files <- function(archr_out, seurat_out, out_dir){
+write_files <- function(archr_out, seurat_out, out_dir, window_size){
     ### Load Seurat and ArchR objects
     scatac.object <- loadArchRProject(archr_out)
     scrna.object <- readRDS(seurat_out)
@@ -110,11 +113,11 @@ write_files <- function(archr_out, seurat_out, out_dir){
     }
     print(paste(n_cells, "cells in common between scATAC and scRNA objects"))
 
-    tm.filtered <- get_gene_tile_matrix(scatac.object, scrna.object)
+    tm.filtered <- get_gene_tile_matrix(scatac.object, scrna.object, window_size=window_size)
     cell.info <- cbind(scrna.object@meta.data, as.data.frame(scatac.object@cellColData))
     cell.info <- cell.info[!duplicated(as.list(cell.info))]
     selected.genes <- unique(rowData(tm.filtered)$symbol)
-
+    selected.genes <- c("ZEB2", "HLA-DQB1")
     h5file <- paste(out_dir, 'coassay_matrix.h5', sep = '/')
     h5createFile(h5file)
     out <- lapply(selected.genes, function(x) write_hdf5(h5file, tm.filtered, x))
