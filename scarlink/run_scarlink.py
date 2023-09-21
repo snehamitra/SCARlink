@@ -11,9 +11,9 @@ def main():
     parser.add_argument('-p', '--proc', required=False, type=int, help="Process id. This should be set to the job index when running in parallel on a cluster.")
     parser.add_argument('-np', '--nproc', required=False, type=int, help="Number of parallel jobs. Default value is 100 when -p is provided.")
     parser.add_argument('-c', '--celltype', required=False, type=str, help="Cell type column name. This column should be present in the Seurat/ArchR object provided in scarlink_processing.")
-    parser.add_argument('--sparsity', required=False, type=float, help="Maximum allowed sparsity in gene expression vector to run the regression model. Default is 0.9 meaning there can be at most 90% zeros in the gene expression vector.")
+    parser.add_argument('--sparsity', required=False, type=float, help="Maximum allowed sparsity in gene expression vector to run the regression model. Default is 0.9 meaning there can be at most 90 percent zeros in the gene expression vector.")
     args = parser.parse_args()
-
+    print("HERE")
     dirname = args.outdir
     dirname = dirname + '/' if dirname[-1] != '/' else dirname
     output_dir = dirname + 'scarlink_out/'
