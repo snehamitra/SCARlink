@@ -7,8 +7,8 @@ from scarlink.src.read_model import read_model
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-o', '--outdir', required=True, type=str)
-    parser.add_argument('-c', '--celltype', required=True, type=str)
+    parser.add_argument('-o', '--outdir', required=True, type=str, help="Output directory. Must be the same as the output directory used for scarlink_processing and scarlink.")
+    parser.add_argument('-c', '--celltype', required=True, type=str, help="Cell type column name. This column should be present in the Seurat/ArchR object provided in scarlink_processing and scarlink must have been run with the same cell type column name.")
     args = parser.parse_args()
 
     dirname = args.outdir
@@ -33,6 +33,7 @@ def main():
     _, adj_pval, _, _ = multipletests(df_all['p-value'].values, method='fdr_bh')
     df_all['FDR'] = adj_pval
     df_all.to_csv(dirname + 'gene_linked_tiles_' + celltype_col + '.csv.gz', sep='\t', index=None)
+    rm.input_file_handle.close()
     print("Saved output:", dirname + 'gene_linked_tiles_' + celltype_col + '.csv.gz')
     
 if __name__ == '__main__':

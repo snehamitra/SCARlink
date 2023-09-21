@@ -5,22 +5,49 @@ import numpy as np
 import pandas 
 import anndata as ad
 import scanpy as sc
-import seaborn
 import sklearn.preprocessing
 from scipy import stats
-import scipy
 import sklearn.neighbors
 from sklearn.cluster import AgglomerativeClustering
 from scarlink.src.get_smoothed_pred_obs import smooth_vals
 import warnings
 warnings.filterwarnings("ignore", message="Transforming to str index.")
 warnings.filterwarnings("ignore", message="An input array is constant; the correlation coefficient is not defined.") 
-# warnings.filterwarnings("ignore", message="No data for colormapping provided via 'c'. Parameters 'cmap' will be ignored invalid value encountered in divide") 
 warnings.filterwarnings( "ignore", module = "matplotlib\..*" )
 
-def create_object(dirname, smooth_k=50, remove_celltype='', celltype_col='celltype', umap_file=''):
+def create_object(dirname, smooth_k=10, use_hvg=True, celltype_col='celltype', umap=None, lsi_file=''):
+    """Create SCARlink object for estimating chromatin potential. The 
+    function creates two AnnData objects for predicted and observed 
+    gene expression.
+    
+    Parameters
+    ----------
+    dirname : str
+        Output directory name. This is the output directory used as --outdir parameter
+        when running scarlink.
+    smooth_k : int
+        Number of nearest neighbors to smooth gene expression over.
+    use_hvg : bool
+        Used in development mode only.
+    celltype_col : str
+        The column in the cell_info data frame inside coassay_matrix.h5
+        containing the cell groupings.
+    umap : matrix
+        User-provided UMAP. If not provided, a force directed layout is 
+        computed.
+    lsi_file : str
+        Path to file containing LSI of scATAC-seq. By default SCARlink
+        saves the lsi matrix during scarlink_preprocessing. However, an 
+        alternate LSI matrix can be used.
+    
+    Returns
+    -------
+    d
+        Dictionary with predicted and observed gene expression.
+    """
+
     cell_info_file = dirname + '/cell_info.txt'
-    lsi_file = dirname + '/scatac_LSI.csv'
+    if lsi_file=='': lsi_file = dirname + '/scatac_LSI.csv'
     out_dir = dirname + '/scarlink_out/'
     lsi = pandas.read_csv(lsi_file, sep='\t').values
     yp, yo = smooth_vals(out_dir, lsi, smooth_k)
@@ -28,11 +55,19 @@ def create_object(dirname, smooth_k=50, remove_celltype='', celltype_col='cellty
 
     yp.index = yp.index.astype(str)
     yo.index = yo.index.astype(str)
-    
+
     adata_pred = ad.AnnData(yp)
     adata_obs = ad.AnnData(yo)
+
     adata_pred.obs = cell_info
     adata_obs.obs = cell_info
+
+    # if not use_hvg:
+    #     print("Using all genes to estimate chromatin potential")
+    # else:
+    #     hvg = pandas.read_csv(dirname + '/hvg.txt', sep='\t', header=None)[0].values
+    #     adata_obs = adata_obs[:, adata_obs.var_names.isin(hvg)].copy()
+    #     adata_pred = adata_pred[:, adata_pred.var_names.isin(hvg)].copy()
 
     d = {}
     d['dirname'] = dirname
@@ -40,24 +75,47 @@ def create_object(dirname, smooth_k=50, remove_celltype='', celltype_col='cellty
     d['obs'] = adata_obs
     d['cell_info'] = cell_info
     d['celltype_col'] = celltype_col
-    if umap_file != '':
-        coords = pandas.read_csv(umap_file, sep='\t')
-        d['umap'] = coords.values
+    
+    # use user provided embedding
+    if umap is not None:
+        d['umap'] = umap 
         d['obs'].obsm['X_umap'] = d['umap']
     adata_scv = d['obs'].copy()
     adata_scv.obsm['X_pca'] = lsi
-    # adata_scv.obsm['X_umap'] = d['umap']
+    if umap is not None: adata_scv.obsm['X_umap'] = d['umap']
     sc.pp.neighbors(adata_scv, n_neighbors=20, n_pcs=lsi.shape[1])
-    sc.tl.paga(adata_scv, groups=celltype_col)
-    sc.pl.paga(adata_scv)
-    sc.tl.draw_graph(adata_scv, layout='fa', init_pos='paga', iterations=5000)
+
+    if umap is None:
+        sc.tl.paga(adata_scv, groups=celltype_col)
+        sc.pl.paga(adata_scv)
+        sc.tl.draw_graph(adata_scv, layout='fa', init_pos='paga', iterations=5000)
+        d['umap_key'] = 'draw_graph_fa'
+    else:
+        d['umap_key'] = 'umap'
     d['obs'] = adata_scv
     return d
 
 # clustering function
 def cluster_genes(d, n_clust=2):
+    """Cluster genes expression matrix using hierarchical clustering.
+    Note that here the genes are clustered and not the cells.
+    
+    Parameters
+    ----------
+    d : dictionary
+        Dictionary with predicted and observed gene expression.
+    n_clust : int
+        Number of clusters.
+    
+    Returns
+    -------
+    d
+        Dictionary with gene clusters.
+    """
+
     yo_file = d['dirname'] + '/scarlink_out/obs_unsmooth.csv'
     yo = pandas.read_csv(yo_file, sep="\t").T
+    yo = yo.iloc[yo.index.isin(d['pred'].var_names), ]
 
     cell_info_file = d['dirname'] + '/cell_info.txt'
     cell_info = pandas.read_csv(cell_info_file, sep="\t")
@@ -84,6 +142,25 @@ def cluster_genes(d, n_clust=2):
     return var_names
 
 def filter_genes(d, batch, genes):
+    """Extract a the gene expression for a subset of provided 
+    genes from the predict and observed AnnData objects.
+    
+    Parameters
+    ----------
+    d : dictionary
+        Dictionary with predicted and observed gene expression.
+    batch : str
+        Not implemented.
+    genes : [str]
+        List of genes to extract.
+    
+    Returns
+    -------
+    d
+        Dictionary with predicted and observed gene expression
+        for a subset of genes.
+    """
+
     if batch is None:
         batch_key = ''
     else:
@@ -95,6 +172,31 @@ def filter_genes(d, batch, genes):
     return d
 
 def smooth_arrows(x, y, u, v, smooth_w=50, min_count=5, take_top=0):
+    """Smooth arrows in each window.
+    
+    Parameters
+    ----------
+    x : [float]
+        Starting x-coordinates for the arrows.
+    y : [float]
+        Starting y-coordinates for the arrows.
+    u : [float]
+        Length of arrows in x-axis.
+    v : [float]
+        Length of arrows in y-axis.
+    smooth_w : int
+        Create smooth_w X smooth_w windows to smooth arrows over.
+    min_count : int
+        Minimum number of arrows in a window required to smooth.
+    take_top : int
+        Number of top arrows to select per window.
+    
+    Returns
+    -------
+    x_ms, y_ms, Ex_ms, Ey_ms
+        Smoothed arrow coordinates and arrow sizes.
+    """
+
     x_ms = []
     y_ms = []
     Ex_ms = []
@@ -132,8 +234,34 @@ def smooth_arrows(x, y, u, v, smooth_w=50, min_count=5, take_top=0):
     return x_ms, y_ms, Ex_ms, Ey_ms
 
 def calc_velocity(d, pred_key='y_pred_scaled_filtered', 
-                     obs_key='y_obs_scaled_filtered', max_per_cell=10, pseudo_count=1, 
-                     remove_zeros=False, umap_key='umap', metric='correlation', batch=None):
+                     obs_key='y_obs_scaled_filtered', max_per_cell=10, 
+                     umap_key='umap', metric='correlation', batch=None):
+    """Calculate chromatin potential.
+    
+    Parameters
+    ----------
+    d : dictionary
+        Dictionary with predicted and observed gene expression.
+    pred_key : str
+        Key in dictionary containing predicted gene expression.
+    obs_key : str
+        Key in dictionary containing observed gene expression.
+    max_per_cell : int
+        Number of neighbors to compute chromatin potential over.
+    umap_key : str
+        Key to access UMAP or FDL coordinates.
+    metric : str
+        Metric to use to estimate similarity between predicted and 
+        observed gene expression.
+    batch : str
+        Not implemented.
+    
+    Returns
+    -------
+    umap, V, M
+        Arrow coordinates and length of arrows.
+    """
+
     yp = d[pred_key].values 
     yo = d[obs_key].values
     umap = d['obs'].obsm['X_' + umap_key] \
@@ -182,6 +310,24 @@ def calc_velocity(d, pred_key='y_pred_scaled_filtered',
     return(umap, V, M)
 
 def get_corrs(d, pred_key='pred', obs_key='obs'):
+    """Compute correlation between predicted and observed
+    gene expression for each gene.
+    
+    Parameters
+    ----------
+    d : dictionary
+        Dictionary with predicted and observed gene expression.
+    pred_key : str
+        Dictionary key for predicted gene expression.
+    obs_key : str
+        Dictionary key for observed gene expression.
+    
+    Returns
+    -------
+    corrs
+        Correlations for each gene.
+    """
+
     scaler = sklearn.preprocessing.StandardScaler()
     yp = scaler.fit_transform(d[pred_key].X)
     yo = scaler.fit_transform(d[obs_key].X)
@@ -192,6 +338,36 @@ def get_corrs(d, pred_key='pred', obs_key='obs'):
 def chrom_pot(d_orig, batch=None, umap_key='umap', max_per_cell=10,
               metric='cosine', scale_max_abs_val=10,
              gene_corr_cutoff=0, scaling='standard'):
+    """Compute chromatin potential.
+    
+    Parameters
+    ----------
+    d_orig : dictionary
+        Dictionary with predicted and observed gene expression.
+    batch : str
+        Not implemented.
+    umap_key : str
+        Key to access UMAP or FDL coordinates.
+    max_per_cell : int
+        Number of neighbors to compoute chromatin potential over.
+    metric : str
+        Metric to use to estimate similarity between predicted and 
+        observed gene expression.
+    scale_max_abs_val : float
+        Trimming scaled values.
+    gene_corr_cutoff : float
+        Subset genes based on minimum correlation between predicted and observed
+        gene expression to consider for chromatin potential.
+    scaling : str
+        Can be 'standard' or 'minmax'
+    
+    Returns
+    -------
+    x, v, d, M
+        Return arrows, arrow sizes, and dictionary with predicted and 
+        observed gene expression.
+    """
+
     d = d_orig.copy()
     if scaling == 'standard':
         scaler = sklearn.preprocessing.StandardScaler()
@@ -217,7 +393,6 @@ def chrom_pot(d_orig, batch=None, umap_key='umap', max_per_cell=10,
     for i in range(yp.shape[0]):
         idx = np.argsort(yo[i])
         idx = idx[corrs[idx] > gene_corr_cutoff]
-        #r_i = np.random.choice(np.arange(yp.shape[0]), size=1)[0]
         c, _ = stats.pearsonr(yp[i][idx], yo[i][idx])
         corrs_rows.append(c)
 
@@ -245,23 +420,48 @@ def chrom_pot(d_orig, batch=None, umap_key='umap', max_per_cell=10,
 
     return x, v, d, M
 
-def plot_arrows(d_data, genes=[], umap_key='draw_graph_fa'):
+def plot_arrows(d_data, genes=[], smooth_w=40, figsize=(10,8), max_per_cell=10, gene_corr_cutoff=0, n_arrows=500, min_count=5, **kwargs):
+    """Plot chromatin potential arrows.
+    
+    Parameters
+    ----------
+    d_data : dictionary
+        Dictionary with predicted and observed gene expression.
+    genes : [str]
+        Gene subset to use for estimating chromatin potential.
+    smooth_w : int
+        Create smooth_w X smooth_w windows to smooth arrows over.
+    figsize : (float, float)
+        Size of output plot.
+    max_per_cell : int
+        Number of neighbors to compoute chromatin potential over.
+    gene_corr_cutoff : float
+        Subset genes based on minimum correlation between predicted and observed
+        gene expression to consider for chromatin potential.
+    n_arrows : int
+        Number of arrows to plot.
+    min_count : int 
+        Minimum number of arrows in a window required to smooth.
+    **kwargs 
+        Additional arguments passed to quiver().
+    """
+
     batch = None
+    umap_key = d_data['umap_key']
     d = d_data.copy()
     if genes != []:
         d = filter_genes(d, batch, genes)
-    d['draw_graph_fa'] = d_data['obs'].obsm['X_draw_graph_fa']
-    # d['umap'] = d_data['obs'].obsm['X_umap']
-    x, v, d, M = chrom_pot(d, batch=batch, umap_key=umap_key, max_per_cell=10, 
-                       metric='correlation', gene_corr_cutoff=0,
+    d[umap_key] = d_data['obs'].obsm['X_' + umap_key]
+    x, v, d, M = chrom_pot(d, batch=batch, umap_key=umap_key, max_per_cell=max_per_cell, 
+                       metric='correlation', gene_corr_cutoff=gene_corr_cutoff,
                            scaling='minmax')
     r_idx = np.random.choice(np.arange(x.shape[0]),
-                             size=500, replace=False) if x.shape[0] >= 500 \
+                             size=n_arrows, replace=False) if x.shape[0] >= n_arrows \
                              else np.arange(x.shape[0])
     E_norm = np.sqrt(v[:, 0]**2 + v[:, 1]**2)[r_idx]
 
     scv_key = 'obs'
-    fig = plt.figure(figsize=(10, 8))
+    fig = plt.figure(figsize=figsize)
     if umap_key == 'draw_graph_fa':
         ax = sc.pl.draw_graph(d[scv_key], color=d['celltype_col'], show=False, ax=plt.gca(), frameon=False)
     else:
@@ -269,8 +469,8 @@ def plot_arrows(d_data, genes=[], umap_key='draw_graph_fa'):
 
     x_smooth, y_smooth, u_smooth, v_smooth = smooth_arrows(x[:, 0], x[:, 1], 
                                                            v[:, 0], v[:, 1], 
-                                                           smooth_w=40)
+                                                           smooth_w=smooth_w, min_count=min_count)
     E_norm_smooth = np.sqrt(u_smooth**2 + v_smooth**2)
     plt.quiver(x_smooth, y_smooth,
                u_smooth/E_norm_smooth, v_smooth/E_norm_smooth, 
-               angles='xy', scale_units='xy')
+               angles='xy', scale_units='xy', **kwargs)

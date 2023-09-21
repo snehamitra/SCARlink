@@ -11,6 +11,30 @@ warnings.filterwarnings("ignore", message=".*The 'nopython' keyword.*")
 import shap
 
 def set_gene_tile_significance_bootstrapped(x, y, w_mat, e, cell_info, celltype_col):
+    """Compute standardized Shapley values for each group of cell clusters.
+    
+    Parameters
+    ----------
+    x : [[float]]
+        Tile matrix for a gene.
+    y : [float]
+        Gene expression vector for same gene.
+    w_mat : [float]
+        Learned regression coefficients.
+    e : float
+        Learned regression bias.
+    cell_info : data frame
+        Cell metadata found in key cell_info in coassay_matrix.h5
+    celltype_col : str
+        Column in cell_info containing cell clusters.
+
+    Returns
+    -------
+    zscore_d
+        Dictionary of standardized z-scores for each tile and cell type
+        for a given gene.
+    """
+
     n = 500
     clf = linear_model.PoissonRegressor()
     clf.fit(x, y)
@@ -54,11 +78,39 @@ def set_gene_tile_significance_bootstrapped(x, y, w_mat, e, cell_info, celltype_
 
 
 def set_gene_tile_significance_signed_rank(x, y, w_mat, e, cell_info, celltype_col, z_d):
+    """Compute the significance of the difference in gene expression prediction when a tile
+    is zero-ed out.
+    
+    Parameters
+    ----------
+    x : [[float]]
+        Tile matrix for a gene.
+    y : [float]
+        Gene expression vector for same gene.
+    w_mat : [float]
+        Learned regression coefficients.
+    e : float
+        Learned regression bias.
+    cell_info : data frame
+        Cell metadata found in key cell_info in coassay_matrix.h5
+    celltype_col : str
+        Column in cell_info containing cell clusters.
+    zscore_d : dictionary
+        Dictionary of standardized z-scores for each tile and cell type
+        for a given gene.
+
+    Returns
+    -------
+    p_vals_d
+        Dictionary of p-values for each tile and cell type
+        for a given gene.
+    """
+
     clf = linear_model.PoissonRegressor()
     clf.fit(x, y)
     clf.coef_ = np.ravel(w_mat)
     clf.intercept_ = e
-    ypred = clf.predict(x).astype(np.float32)
+    ypred = clf.predict(x) # .astype(np.float32)
     clusters = cell_info[celltype_col].unique()
     b_clust = []
     p_vals_d = {}
@@ -78,7 +130,7 @@ def set_gene_tile_significance_signed_rank(x, y, w_mat, e, cell_info, celltype_c
             if x_clust[:, idx].sum() == 0: continue
             x_clust_mod = x_clust.copy()
             x_clust_mod[:, idx] = 0
-            ypred_clust_mod = clf.predict(x_clust_mod).astype(np.float32)
+            ypred_clust_mod = clf.predict(x_clust_mod) # .astype(np.float32)
             if np.sum(ypred_clust != ypred_clust_mod) < 20: continue
             _, pv = stats.wilcoxon(ypred_clust, ypred_clust_mod, alternative='greater')
             all_p_vals[idx] = pv
@@ -86,5 +138,5 @@ def set_gene_tile_significance_signed_rank(x, y, w_mat, e, cell_info, celltype_c
 
     for c in clusters:
         if c not in p_vals_d:
-            p_vals_d[c] = np.zeros(w_mat.shape[0])
+            p_vals_d[c] = np.ones(w_mat.shape[0])
     return p_vals_d

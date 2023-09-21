@@ -8,12 +8,10 @@ library(ArchR)
 library(Seurat)
 library(rhdf5)
 library(parallel)
+library(BiocParallel)
 
 ### FUNCTIONS
 get_gene_tile_matrix <- function(scatac.object, scrna.object, window_size=250000){
-
-    # # tile size set to 500
-    # tile_size <- 500
 
     # get tile matrix for variable genes
     geneRegions <- getGenes(scatac.object)
@@ -23,7 +21,6 @@ get_gene_tile_matrix <- function(scatac.object, scrna.object, window_size=250000
     geneDownstream = window_size
     geneRegions <- trim(extendGR(gr = geneRegions, upstream = geneUpstream, downstream = geneDownstream))
     geneRegions <- geneRegions[geneRegions$symbol %in% scrna.object$RNA@var.features, ]
-
 
     tm <- getMatrixFromProject(
         ArchRProj = scatac.object,
@@ -45,28 +42,52 @@ get_gene_tile_matrix <- function(scatac.object, scrna.object, window_size=250000
 
     tm.filtered <- tm.filtered[, match(colnames(scrna.object), colnames(tm))]
     rowData(tm.filtered)$end <- rowData(tm.filtered)$start + tile_size
+
     return(tm.filtered)
+}
+
+split_write_hdf5 <- function(dirname, selected.genes, tm.filtered)
+{
+    h5file <- tempfile(pattern="tmp_coassay_matrix", fileext=".h5", tmpdir=path.expand(dirname))
+    h5createFile(h5file)    
+    out <- lapply(selected.genes, function(x) write_hdf5(h5file, tm.filtered, x))
+    return(h5file)
+}
+
+gather_tmp_h5 <- function(output_file, tmp_files) {
+
+  # create the output file
+  fid <- H5Fcreate(name = output_file)
+  on.exit(H5Fclose(fid))
+  
+  ## iterate over the temp files and copy the named dataset into our new file
+  for(i in tmp_files) {
+    fid2 <- H5Fopen(i)
+    genes <- h5ls(fid2, recursive=FALSE)$name
+    for(gene in genes){
+    	H5Ocopy(fid2, gene, h5loc_dest=fid, name_dest=gene)
+    }
+    H5Fclose(fid2)
+  }  
 }
 
 write_hdf5 <- function(path, tile.matrix, gene)
 {
-    print(gene)
     path <- path.expand(path) # protect against tilde's.
-    # h5createFile(path)
+
     group <- gene
     h5createGroup(path, group)
 
-    tile.matrix.gene <- tile.matrix[rowData(tile.matrix)$symbol == gene, ]
+    cond <- rowData(tile.matrix)$symbol == gene
 
-    h5write(as.data.frame(rowData(tile.matrix.gene)), file=path, name=paste0(group, "/tile_info"))
+    h5write(as.data.frame(rowData(tile.matrix[cond, ])), file=path, name=paste0(group, "/tile_info"))
 
     # Saving matrix information.
-    x <- tile.matrix.gene@assays@data$TileMatrix
-    h5write(x@x, file=path, name=paste0(group, "/data"))
-    h5write(dim(x), file=path, name=paste0(group, "/shape"))
-    h5write(x@i, file=path, name=paste0(group, "/indices")) # already zero-indexed.
-    h5write(x@p, file=path, name=paste0(group, "/indptr"))
-
+    h5write(tile.matrix[cond, ]@assays@data$TileMatrix@x, file=path, name=paste0(group, "/data"))
+    h5write(dim(tile.matrix[cond, ]@assays@data$TileMatrix), file=path, name=paste0(group, "/shape"))
+    h5write(tile.matrix[cond, ]@assays@data$TileMatrix@i, file=path, name=paste0(group, "/indices")) # already zero-indexed.
+    h5write(tile.matrix[cond, ]@assays@data$TileMatrix@p, file=path, name=paste0(group, "/indptr"))
+    
     return(NULL)
 }
 
@@ -91,10 +112,19 @@ write_hdf5_rna <- function(path, scrna, genes)
     return(NULL)
 }
 
-write_files <- function(archr_out, seurat_out, out_dir, window_size){
+write_files <- function(archr_out, seurat_out, out_dir, window_size, ncores, scale){
     ### Load Seurat and ArchR objects
     scatac.object <- loadArchRProject(archr_out)
     scrna.object <- readRDS(seurat_out)
+    
+    ### Normalize and scale values by  median or 10,000
+    if(scale=='median'){
+	scale.factor = median(colSums(scrna.object[['RNA']]@counts))
+    }
+    else{
+	scale.factor = 10000
+    }
+    scrna.object <- NormalizeData(scrna.object, normalization.method = "RC", scale.factor=scale.factor)
 
     ### Create output directory if it doesn't exist
     if(!file.exists(out_dir)){
@@ -117,10 +147,36 @@ write_files <- function(archr_out, seurat_out, out_dir, window_size){
     cell.info <- cbind(scrna.object@meta.data, as.data.frame(scatac.object@cellColData))
     cell.info <- cell.info[!duplicated(as.list(cell.info))]
     selected.genes <- unique(rowData(tm.filtered)$symbol)
-    selected.genes <- c("ZEB2", "HLA-DQB1")
+
+    if(ncores > 1){
+    	bpparam <- MulticoreParam(workers=ncores) 
+    }
+    else{
+	bpparam <- BiocParallel::SerialParam()
+    }
+
+    # create chunks
+    max_ix <- min(length(selected.genes), max(trunc(length(selected.genes)/50), 50))
+    
+    tmp_files <- bplapply(1:max_ix, FUN = function(i) {
+    	   selected.genes.subset <- selected.genes[seq(i, length(selected.genes), max_ix)]
+    	   split_write_hdf5(out_dir, selected.genes.subset, tm.filtered[rowData(tm.filtered)$symbol %in% selected.genes.subset, ])
+           }, 
+           BPPARAM=bpparam) 
+    
+    o <- h5closeAll()	    
+
+    tmp_files <- as.vector(unlist(tmp_files))
+
     h5file <- paste(out_dir, 'coassay_matrix.h5', sep = '/')
-    h5createFile(h5file)
-    out <- lapply(selected.genes, function(x) write_hdf5(h5file, tm.filtered, x))
+    
+    # h5createFile(h5file)
+
+    # gathering output in one file
+    gather_tmp_h5(h5file, tmp_files)
+
+    file.remove(tmp_files)
+
     write_hdf5_rna(h5file, scrna.object, selected.genes)
 
     cell.info['cell_name'] = unlist(as.vector(lapply(rownames(cell.info), function(x) strsplit(x, '')[[1]][2])))
@@ -138,4 +194,8 @@ write_files <- function(archr_out, seurat_out, out_dir, window_size){
     dists <- nabor::knn(lsi, lsi, k = 50)$nn.dists
     nbrs <- nbrs - 1
     write.table(nbrs, file=paste(out_dir, "knn-50-scatac.csv", sep=""), quote=FALSE, sep='\t', row.names=FALSE, col.names=FALSE)
+
+    ## Save variable genes list
+    # scrna.object <- FindVariableFeatures(scrna.object, selection.method = "vst", nfeatures = 5000)	
+    write.table(VariableFeatures(scrna.object), file=paste(out_dir, "hvg.txt", sep=""), sep='\t', quote=FALSE, row.names=FALSE, col.names=FALSE)
 }

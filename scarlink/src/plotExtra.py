@@ -12,6 +12,22 @@ import random
 plt.rcParams['text.usetex'] = False
 
 def plotRegion(chrm, start, end, ax, gtf_file):
+    """Plot gene annotations.
+    
+    Parameters
+    ----------
+    chrm : str
+        Chromosome number.
+    start : int
+        Start coordinate.
+    end : int
+        End coordinate.
+    ax : axis
+        Axis to plot on.
+    gtf_file : str
+        Path to GTF file.
+    """
+    
     a = pandas.read_csv(gtf_file, sep = "\t", header = None)
     a = a[(a[0] == chrm) & (a[3] <= end) & (a[4] >= start)]
 
@@ -52,6 +68,8 @@ def plotRegion(chrm, start, end, ax, gtf_file):
     ax.spines['bottom'].set_visible(False) # new
 
 def get_fragment_counts(fragment_file, cell_info, chrm, start, end):
+    """Not fully implemented.
+    """
     tabixfile = pysam.TabixFile(fragment_file)
     arr = np.zeros(end - start).astype(np.uintc)
     for tsv in tabixfile.fetch(chrm, start, end):
@@ -62,6 +80,8 @@ def get_fragment_counts(fragment_file, cell_info, chrm, start, end):
     return arr
 
 def plot_hist(hist, title):
+    """Plot training loss and validation loss.
+    """
     plt.plot(hist.history['loss'])
     plt.plot(hist.history['val_loss'])
     plt.legend(['loss', 'val_loss'])
@@ -71,6 +91,13 @@ def plot_hist(hist, title):
     plt.close()
 
 def create_colormap(clusters):
+    """Create color map for cell clusters.
+
+    Parameters
+    ----------
+    clusters : [str]
+        Cluster names.
+    """
     stallion_cmap = ["#D51F26", "#272E6A", "#208A42", "#89288F", "#F47D2B", "#FEE500", "#8A9FD1", "#C06CAB", "#E6C2DC", "#90D5E4", "#89C75F", "#F37B7D", "#9983BD", "#D24B27", "#3BBCA8", "#6E4B9E", "#0C727C", "#7E1416", "#D8A767", "#3D3D3D"]
     n = len(clusters)
     if n <= 10:

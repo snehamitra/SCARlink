@@ -9,6 +9,21 @@ from scarlink.src.model import RegressionModel
 from scarlink.src.read_model import read_model
 
 def get_gene_gex_tiles(rm, gene):
+    """Get gene expression vector and associated tile matrix.
+    
+    Parameters
+    ----------
+    rm : RegressionModel
+        Regression model object.
+    gene : str
+        Gene for which the information is to be extracted.
+    
+    Returns
+    -------
+    gene_gex, tile_gene_mat
+        Gene expression vector and tile matrix.
+    """
+
     gene_gex = rm.gex_matrix[:, rm.gene_info['gene_name'] == gene]
     tile_gene_mat = rm.gene_tile_matrix(gene)
     row_indices, col_indices = tile_gene_mat.nonzero()
@@ -17,6 +32,32 @@ def get_gene_gex_tiles(rm, gene):
     return gene_gex, tile_gene_mat
 
 def get_y_unscaled(dirname, genes, yp_file, yo_file, smooth_vals=True, nbrs=None, all_genes=False):
+    """Get predicted and observed gene expression for given set of genes.
+    
+    Parameters
+    ----------
+    dirname : str
+        Output directory name. This is the output directory used as --outdir parameter
+        when running scarlink.
+    genes : [str]
+        Set of genes for which to extract gene expression.
+    yp_file : str
+        Filename to save predicted gene expression.
+    yo_file : str
+        Filename to store observed gene expression.
+    smooth_vals : bool
+        Whether to smooth predicted and observed gene expression.
+    nbrs : [int]
+        Not implemented.
+    all_genes : bool
+        Whether to get predicted and observed gene expression for all genes.
+    
+    Returns
+    -------
+    y_preds_save.T, y_obs_save.T
+        Predicted and observed gene expression data frames.
+    """
+
     all_coef_files = glob.glob(dirname + 'coefficients*.hd5')
     if os.path.isfile(yp_file) and os.path.isfile(yo_file):
         y_pred_save = pandas.read_csv(yp_file, sep='\t')
@@ -62,6 +103,24 @@ def get_y_unscaled(dirname, genes, yp_file, yo_file, smooth_vals=True, nbrs=None
     return y_preds_save.T, y_obs_save.T
 
 def smooth_vals(out_dir, lsi, k):
+    """Smooth predicted and observed gene expression over k nearest neighbor graph.
+    
+    Parameters
+    ----------
+    out_dir : str
+        Directory in which SCARlink regression outputs are going to be saved. The function creates 
+        directory <output dir>/scarlikn_out in which results are saved.
+    lsi : matrix
+        LSI matrix.
+    k : int
+        k-nearest neighbors for kNN graph.
+    
+    Returns
+    -------
+    yp_new, yo_new
+        Predicted and observed gene expression data frames.
+    """
+
     u_pred_file = out_dir + '/pred_unsmooth.csv'
     u_obs_file = out_dir + '/obs_unsmooth.csv'
     yp_df, yo_df = get_y_unscaled(out_dir, [], u_pred_file,
