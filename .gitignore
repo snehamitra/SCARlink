@@ -9,3 +9,4 @@ scarlink_conda.txt
 *_bak.R
 *_bak.py
 scarlink/preprocessing/read_seurat_archr_bak*.R
+scarlink/preprocessing/read_seurat_archr_downsampled.R

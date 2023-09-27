@@ -116,7 +116,7 @@ write_files <- function(archr_out, seurat_out, out_dir, window_size, ncores, sca
     ### Load Seurat and ArchR objects
     scatac.object <- loadArchRProject(archr_out)
     scrna.object <- readRDS(seurat_out)
-    
+
     ### Normalize and scale values by  median or 10,000
     if(scale=='median'){
 	scale.factor = median(colSums(scrna.object[['RNA']]@counts))

@@ -294,6 +294,7 @@ class RegressionModel:
         sp_corr = f['genes/' + gene].attrs['spearman_correlation_test']
         m_z = read_sparse_significance(f, k, 'z-score')
         m_p = read_sparse_significance(f, k, 'p-value')
+
         df_z = pandas.DataFrame(m_z.todense(), columns=clusters)
         df_p = pandas.DataFrame(10**(-np.array(m_p.todense())), columns=clusters)
         tiles = self.input_file_handle.select(gene + '/tile_info')
@@ -368,7 +369,7 @@ class RegressionModel:
         tile_gene_mat_train, tile_gene_mat_test = self.gene_tile_matrix_scaled(gene,
                         normalization_factor='ReadsInTSS')
         x = np.array(tile_gene_mat_train.todense())
-        z_d = set_gene_tile_significance_bootstrapped(x, np.ravel(gex_train.todense()), w_mat, e, self.cell_info.iloc[self.train_ix], celltype_col)
+        z_d = set_gene_tile_significance_bootstrapped(x, np.ravel(gex_train.todense()), w_mat, e, self.cell_info.iloc[self.train_ix], celltype_col, self.cell_info[celltype_col].unique())
         f.close()
         return z_d 
 
@@ -401,7 +402,7 @@ class RegressionModel:
         tile_gene_mat_train, tile_gene_mat_test = self.gene_tile_matrix_scaled(gene,
                         normalization_factor='ReadsInTSS')
         x = np.array(tile_gene_mat_test.todense())
-        p_d = set_gene_tile_significance_signed_rank(x, np.ravel(gex_test.todense()), w_mat, e, self.cell_info.iloc[self.test_ix], celltype_col, z_d)
+        p_d = set_gene_tile_significance_signed_rank(x, np.ravel(gex_test.todense()), w_mat, e, self.cell_info.iloc[self.test_ix], celltype_col, self.cell_info[celltype_col].unique(), z_d)
         f.close()
         return p_d 
 

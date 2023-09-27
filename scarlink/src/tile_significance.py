@@ -10,7 +10,7 @@ import warnings
 warnings.filterwarnings("ignore", message=".*The 'nopython' keyword.*")
 import shap
 
-def set_gene_tile_significance_bootstrapped(x, y, w_mat, e, cell_info, celltype_col):
+def set_gene_tile_significance_bootstrapped(x, y, w_mat, e, cell_info, celltype_col, clusters):
     """Compute standardized Shapley values for each group of cell clusters.
     
     Parameters
@@ -27,6 +27,8 @@ def set_gene_tile_significance_bootstrapped(x, y, w_mat, e, cell_info, celltype_
         Cell metadata found in key cell_info in coassay_matrix.h5
     celltype_col : str
         Column in cell_info containing cell clusters.
+    clusters : [str]
+        List of clusters
 
     Returns
     -------
@@ -42,7 +44,7 @@ def set_gene_tile_significance_bootstrapped(x, y, w_mat, e, cell_info, celltype_
     clf.intercept_ = e
     ypred = clf.predict(x)
     explainer_linear = shap.LinearExplainer(clf, x) 
-    clusters = cell_info[celltype_col].unique()
+    # clusters = cell_info[celltype_col].unique()
     pvals_d = {}
     shap_lst = []
     prod_lst = []
@@ -77,7 +79,7 @@ def set_gene_tile_significance_bootstrapped(x, y, w_mat, e, cell_info, celltype_
     return zscore_d
 
 
-def set_gene_tile_significance_signed_rank(x, y, w_mat, e, cell_info, celltype_col, z_d):
+def set_gene_tile_significance_signed_rank(x, y, w_mat, e, cell_info, celltype_col, clusters, z_d):
     """Compute the significance of the difference in gene expression prediction when a tile
     is zero-ed out.
     
@@ -98,6 +100,8 @@ def set_gene_tile_significance_signed_rank(x, y, w_mat, e, cell_info, celltype_c
     zscore_d : dictionary
         Dictionary of standardized z-scores for each tile and cell type
         for a given gene.
+    clusters : [str]
+        List of clusters
 
     Returns
     -------
@@ -111,7 +115,7 @@ def set_gene_tile_significance_signed_rank(x, y, w_mat, e, cell_info, celltype_c
     clf.coef_ = np.ravel(w_mat)
     clf.intercept_ = e
     ypred = clf.predict(x) # .astype(np.float32)
-    clusters = cell_info[celltype_col].unique()
+    # clusters = cell_info[celltype_col].unique()
     b_clust = []
     p_vals_d = {}
     
