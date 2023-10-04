@@ -38,6 +38,7 @@ Install essential R packages
 ```
 conda install -c conda-forge r-seurat r-devtools r-biocmanager
 conda install -c bioconda bioconductor-rhdf5 \
+      	      	     bioconductor-genomeinfodbdata \
                      bioconductor-chromvar \
                      bioconductor-motifmatchr \
                      bioconductor-complexheatmap
