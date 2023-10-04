@@ -1,4 +1,5 @@
 from setuptools import setup
+import platform
 
 config = {
     'name': 'scarlink',
