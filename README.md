@@ -18,7 +18,7 @@ It is optional to install SCARlink in a conda environment that also has R packag
 
 #### 1. Conda setup
 
-To install SCARlink within conda, first create a conda environment:
+The following conda setup is linux compatible. For conda setup on Apple M1, visit [wiki](https://github.com/snehamitra/SCARlink/wiki/1.-Installation#12-apple-m1). To install SCARlink within conda, first create a conda environment:
 
 ``` python
 conda create -n scarlink-env python=3.8
