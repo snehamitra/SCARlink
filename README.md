@@ -118,4 +118,4 @@ SCARlink can create visualizations for the chromatin accessibility around a gene
 scarlink_tiles -o multiome_out -c celltype --genes GENE1,GENE2
 ```
 
-<sup>*</sup> The manuscript version of SCARlink uses Seurat v4 ArchR 1.0.2. The new Seurat v5 installation is also compatible with SCARlink.
+<sup>*</sup> The manuscript version of SCARlink uses Seurat v4 and ArchR 1.0.2. The new Seurat v5 installation is also compatible with SCARlink.
