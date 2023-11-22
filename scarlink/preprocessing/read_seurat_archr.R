@@ -179,7 +179,10 @@ write_files <- function(archr_out, seurat_out, out_dir, window_size, ncores, sca
 
     write_hdf5_rna(h5file, scrna.object, selected.genes)
 
-    cell.info['cell_name'] = unlist(as.vector(lapply(rownames(cell.info), function(x) strsplit(x, '')[[1]][2])))
+
+    print(head(rownames(cell.info)))
+    # cell.info['cell_name'] = unlist(as.vector(lapply(rownames(cell.info), function(x) strsplit(x, '')[[1]][2])))
+    cell.info['cell_name'] = rownames(cell.info)
     h5write(cell.info, file=h5file, name="cell_info")
 
 
