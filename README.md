@@ -33,7 +33,7 @@ conda config --add channels bioconda
 conda config --add channels conda-forge
 ```
 
-Install essential R packages
+Install essential R packages<sup>*</sup>
 
 ```
 conda install -c conda-forge r-seurat r-devtools r-biocmanager
@@ -117,3 +117,5 @@ SCARlink can create visualizations for the chromatin accessibility around a gene
 ```bash
 scarlink_tiles -o multiome_out -c celltype --genes GENE1,GENE2
 ```
+
+<sup>*</sup> The manuscript version of SCARlink uses Seurat v4 ArchR 1.0.2. The new Seurat v5 installation is also compatible with SCARlink.
