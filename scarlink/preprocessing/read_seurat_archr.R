@@ -186,6 +186,8 @@ write_files <- function(archr_out, seurat_out, out_dir, window_size, ncores, sca
 
     ## Save LSI, cell_info, and KNN as csv files
     lsi <- getReducedDims(ArchRProj = scatac.object, reducedDims = "IterativeLSI")
+    lsi <- lsi[match(colnames(scrna.object), rownames(lsi)), ]
+
     write.table(lsi, file = paste(out_dir, 'scatac_LSI.csv', sep=""), row.names = FALSE, quote = FALSE, sep='\t')
 
     write.table(cell.info, file=paste(out_dir, 'cell_info.txt', sep=""), row.names=FALSE, quote=FALSE, sep='\t')
