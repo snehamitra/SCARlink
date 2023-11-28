@@ -292,6 +292,7 @@ class RegressionModel:
         k = 'tile_significance/' + celltype_col + '/' + gene
         f = h5py.File(self.output_dir + self.out_file, mode = 'r')
         sp_corr = f['genes/' + gene].attrs['spearman_correlation_test']
+        w = f['genes/' + gene][:]
         m_z = read_sparse_significance(f, k, 'z-score')
         m_p = read_sparse_significance(f, k, 'p-value')
 
@@ -305,7 +306,8 @@ class RegressionModel:
         tiles['test_acc_sparsity'] = list(np.ravel(np.sum((tile_acc_test > 0), axis=0) / tile_acc_test.shape[0]))
 
         df_z = pandas.concat([df_z, tiles], axis=1)
-        df_z_long = pandas.melt(df_z, id_vars=['chr', 'start', 'end', 'test_acc', 'test_acc_sparsity'], value_vars=clusters,
+        df_z['regression_coef'] = w
+        df_z_long = pandas.melt(df_z, id_vars=['chr', 'start', 'end', 'test_acc', 'test_acc_sparsity', 'regression_coef'], value_vars=clusters,
                                 var_name=celltype_col, value_name='z-score')
         df_p = pandas.concat([df_p, tiles], axis=1)
         df_p_long = pandas.melt(df_p, id_vars=['chr', 'start', 'end', 'test_acc', 'test_acc_sparsity'], value_vars=clusters,

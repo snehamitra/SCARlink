@@ -19,7 +19,8 @@ config = {
         'scarlink = scarlink.run_scarlink:main',
         'scarlink_tiles = scarlink.run_scarlink_tiles:main',
         'scarlink_plot = scarlink.run_scarlink_visualization:main',
-        'scarlink_processing = scarlink.preprocessing.create_h5_files:main']}
+        'scarlink_processing = scarlink.preprocessing.create_h5_files:main',
+        'scarlink_add_cell_cluster = scarlink.run_scarlink_add_cluster:main']}
 }
 
 if __name__== '__main__':
