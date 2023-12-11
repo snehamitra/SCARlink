@@ -14,7 +14,7 @@ config = {
                          'scanpy==1.9.3',
                          'fa2',
                          'python-igraph==0.9.11',
-                         'rpy2==3.5.12'] + ([] if platform.platform().startswith('macOS') else ['tensorflow==2.11.0']),
+                         'rpy2>=3.5.11'] + ([] if platform.platform().startswith('macOS') else ['tensorflow==2.11.0']),
     'entry_points': {'console_scripts': [
         'scarlink = scarlink.run_scarlink:main',
         'scarlink_tiles = scarlink.run_scarlink_tiles:main',
