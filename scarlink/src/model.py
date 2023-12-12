@@ -885,9 +885,10 @@ class RegressionModel:
             ax[c][1].spines['left'].set_visible(False) 
             ax[c][0].spines['top'].set_visible(False) 
             ax[c][0].spines['right'].set_visible(False) 
-            ax[c][0].spines['left'].set_visible(False) 
 
-            if not show_yticks: ax[c][0].set_yticks([])
+            if not show_yticks: 
+                ax[c][0].set_yticks([])
+                ax[c][0].spines['left'].set_visible(False) 
             
             if c != len(clusters)-1: 
                 ax[c][1].set_xticks([])
