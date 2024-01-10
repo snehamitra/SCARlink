@@ -25,6 +25,7 @@ def get_gene_gex_tiles(rm, gene):
     """
 
     gene_gex = rm.gex_matrix[:, rm.gene_info['gene_name'] == gene]
+
     tile_gene_mat = rm.gene_tile_matrix(gene)
     row_indices, col_indices = tile_gene_mat.nonzero()
     norm_factor = np.array(rm.cell_info['ReadsInTSS'])[row_indices]

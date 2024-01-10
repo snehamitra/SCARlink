@@ -61,13 +61,15 @@ def create_object(dirname, smooth_k=10, use_hvg=True, celltype_col='celltype', u
 
     adata_pred.obs = cell_info
     adata_obs.obs = cell_info
-
-    # if not use_hvg:
-    #     print("Using all genes to estimate chromatin potential")
-    # else:
-    #     hvg = pandas.read_csv(dirname + '/hvg.txt', sep='\t', header=None)[0].values
-    #     adata_obs = adata_obs[:, adata_obs.var_names.isin(hvg)].copy()
-    #     adata_pred = adata_pred[:, adata_pred.var_names.isin(hvg)].copy()
+    
+    ##
+    if not use_hvg:
+        print("Using all genes to estimate chromatin potential")
+    else:
+        hvg = pandas.read_csv(dirname + '/hvg.txt', sep='\t', header=None)[0].values
+        adata_obs = adata_obs[:, adata_obs.var_names.isin(hvg)].copy()
+        adata_pred = adata_pred[:, adata_pred.var_names.isin(hvg)].copy()
+    ##
 
     d = {}
     d['dirname'] = dirname
