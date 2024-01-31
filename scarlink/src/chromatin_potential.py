@@ -391,6 +391,7 @@ def chrom_pot(d_orig, batch=None, umap_key='umap', max_per_cell=10,
     yo[yo < -scale_max_abs_val] = -scale_max_abs_val
 
     corrs = get_corrs(d, pred_key, obs_key)
+    print(str(np.round(np.sum(corrs <= gene_corr_cutoff)/corrs.shape[0]*100, 2)) + "% genes filtered out (" + str(np.sum(corrs <= gene_corr_cutoff)) + " out of " + str(corrs.shape[0]) + " genes).")
     corrs_rows = []
     for i in range(yp.shape[0]):
         idx = np.argsort(yo[i])
