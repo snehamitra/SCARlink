@@ -491,7 +491,7 @@ class RegressionModel:
             a = self.alphas[aix]
             corrs = []
             s_corrs = []
-            ws = []
+            # ws = []
             testlosses = []
             model_weights = []
             for train_ix, test_ix in cv.split(range(rna.shape[0])):
@@ -507,7 +507,7 @@ class RegressionModel:
                 s_corr, s_pval = self.find_correlation_spearman(model_custom, atac_test, rna_test)
                 s_corrs.append(s_corr)
                 testlosses.append(hist.history['val_loss'][-1])
-                ws.append(model_custom.get_layer('rate').get_weights()[0].T.flatten())
+                # ws.append(model_custom.get_layer('rate').get_weights()[0].T.flatten())
                 model_weights.append(model_custom.get_weights())
                 K.clear_session()
                 counter += 1
@@ -515,7 +515,7 @@ class RegressionModel:
                 
             s_corr = np.mean(s_corrs)
             testloss = np.mean(testlosses)
-            w = np.mean(ws, axis = 0)
+            # w = np.mean(ws, axis = 0)
             weights = self.get_model_weight_average(model_weights) 
             
             if np.isnan(s_corr):
