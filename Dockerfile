@@ -1,3 +1,5 @@
+FROM scratch
+
 # Set the working directory inside the container
 WORKDIR /app
 
