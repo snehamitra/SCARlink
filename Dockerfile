@@ -4,7 +4,6 @@ FROM scratch
 WORKDIR /app
 
 # Install basic utilities
-RUN apt-get -y update 
 RUN apt-get -y install bzip2 ca-certificates curl
 
 # Download and install miniconda
