@@ -7,10 +7,13 @@ WORKDIR /app
 RUN apt-get -y update
 RUN apt-get -y install bzip2 ca-certificates 
 
-# Set conda channel order
+# Create conda env
 RUN conda create -n scarlink-env python=3.8
-ENV PATH /opt/conda/envs/scarlink-env/bin:$PATH
-RUN /bin/bash -c "source activate scarlink-env"
+
+# Override default shell and use bash
+SHELL ["conda", "run", "-n", "scarlink-env", "/bin/bash", "-c"]
+
+# Set conda channel order
 RUN conda config --add channels defaults
 RUN conda config --add channels bioconda
 RUN conda config --add channels conda-forge
