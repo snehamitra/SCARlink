@@ -5,10 +5,10 @@ WORKDIR /app
 
 # Install basic utilities
 RUN apt-get -y update
-RUN apt-get -y install bzip2 ca-certificates 
+RUN apt-get -y install bzip2 ca-certificates curl
 
 # Download and install miniconda
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py39_23.11.0-2-Linux-x86_64.sh && bash Miniconda3-py39_23.11.0-2-Linux-x86_64.sh -bf -p /opt/conda && rm Miniconda3-py39_23.11.0-2-Linux-x86_64.sh
+RUN curl -L https://repo.anaconda.com/miniconda/Miniconda3-py39_23.11.0-2-Linux-x86_64.sh -O && bash Miniconda3-py39_23.11.0-2-Linux-x86_64.sh -bf -p /opt/conda && rm Miniconda3-py39_23.11.0-2-Linux-x86_64.sh
 
 # Set conda path
 RUN ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && echo "conda activate base" >> ~/.bashrc 
