@@ -23,6 +23,7 @@ RUN conda config --add channels conda-forge
 RUN conda install -y -c conda-forge mamba
 RUN mamba install -y -c conda-forge r-seurat r-devtools r-biocmanager 
 RUN mamba install -y -c bioconda bioconductor-rhdf5 bioconductor-genomeinfodbdata bioconductor-chromvar bioconductor-motifmatchr bioconductor-complexheatmap
+RUN mamba install -y -c conda-forge 'rpy2>=3.5.11'
 
 # Install ArchR
 RUN R -e 'devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())'
