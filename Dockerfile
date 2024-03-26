@@ -20,7 +20,6 @@ RUN conda config --add channels bioconda
 RUN conda config --add channels conda-forge
 
 # Install packages from conda
-RUN conda install -y python==3.8
 RUN conda install -y -c conda-forge mamba
 RUN mamba install -y -c conda-forge r-seurat r-devtools r-biocmanager 
 RUN mamba install -y -c bioconda bioconductor-rhdf5 bioconductor-genomeinfodbdata bioconductor-chromvar bioconductor-motifmatchr bioconductor-complexheatmap
