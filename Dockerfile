@@ -38,4 +38,4 @@ RUN mkdir /app/SCARlink
 COPY . /app/SCARlink
 WORKDIR /app
 RUN pip install -e SCARlink
-
+RUN pip install notebook
