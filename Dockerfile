@@ -32,7 +32,7 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 # Install SCARlink
-RUN mkdir app/SCARlink
+RUN mkdir /app/SCARlink
 COPY . /app/SCARlink
 WORKDIR /app
 RUN pip install -e SCARlink
