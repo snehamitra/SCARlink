@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM continuumio/miniconda3
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -7,14 +7,10 @@ WORKDIR /app
 RUN apt-get -y update
 RUN apt-get -y install bzip2 ca-certificates 
 
-# Download and install miniconda
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py39_23.11.0-2-Linux-x86_64.sh && bash Miniconda3-py39_23.11.0-2-Linux-x86_64.sh -bf -p /opt/conda && rm Miniconda3-py39_23.11.0-2-Linux-x86_64.sh
-
-# Set conda path
-RUN ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && echo "conda activate base" >> ~/.bashrc 
-ENV PATH /opt/conda/bin:$PATH
-
 # Set conda channel order
+RUN conda create -n scarlink-env python=3.8
+ENV PATH /opt/conda/envs/scarlink-env/bin:$PATH
+RUN /bin/bash -c "source activate scarlink-env"
 RUN conda config --add channels defaults
 RUN conda config --add channels bioconda
 RUN conda config --add channels conda-forge
