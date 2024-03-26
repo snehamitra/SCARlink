@@ -14,7 +14,7 @@ Single-cell ATAC+RNA linking (SCARlink) uses multiomic single-cell ATAC and RNA 
 
 ## Installation 
 
-It is optional to install SCARlink in a conda environment that also has R packages Seurat v4 and ArchR installed. If you already have the R packages installed and want to run SCARlink without conda, jump directly to [step 2](https://github.com/snehamitra/SCARlink?tab=readme-ov-file#2-scarlink-installation) of installation. Alternatively, for Docker setup, jump to step 3.
+It is optional to install SCARlink in a conda environment that also has R packages Seurat v4 and ArchR installed. If you already have the R packages installed and want to run SCARlink without conda, jump directly to [step 2](https://github.com/snehamitra/SCARlink?tab=readme-ov-file#2-scarlink-installation) of installation. Alternatively, for Docker setup, jump to [step 3](https://github.com/snehamitra/SCARlink?tab=readme-ov-file#3-docker-setup).
 
 #### 1. Conda setup
 
