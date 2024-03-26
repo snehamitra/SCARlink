@@ -21,7 +21,8 @@ RUN conda config --add channels conda-forge
 
 # Install packages from conda
 RUN conda install -y -c conda-forge mamba
-RUN mamba create -p /usr/miniconda3/conda_env -y "python==3.8" r-seurat r-devtools r-biocmanager -c bioconda bioconductor-rhdf5 bioconductor-genomeinfodbdata bioconductor-chromvar bioconductor-motifmatchr bioconductor-complexheatmap
+RUN mamba install -y -c conda-forge r-seurat r-devtools r-biocmanager 
+RUN mamba install -y -c bioconda bioconductor-rhdf5 bioconductor-genomeinfodbdata bioconductor-chromvar bioconductor-motifmatchr bioconductor-complexheatmap
 
 # Install ArchR
 RUN R -e 'devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())'
