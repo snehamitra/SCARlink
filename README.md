@@ -1,6 +1,6 @@
 # SCARlink
 
-Preprint available on [bioRxiv](https://www.biorxiv.org/content/10.1101/2023.06.13.544851v1).
+This repository contains the code for SCARlink described in the paper: **Single-cell multi-ome regression models identify functional and disease-associated enhancers and enable chromatin potential analysis** by Mitra, S *et al.*, 2024: [https://www.nature.com/articles/s41588-024-01689-8](https://www.nature.com/articles/s41588-024-01689-8)
 
 Please visit [wiki](https://github.com/snehamitra/SCARlink/wiki) for details about installation and running SCARlink. [Tutorial notebook](https://github.com/snehamitra/SCARlink/blob/main/notebooks/tutorial.ipynb) describes how to run SCARlink on a small example dataset.
 
@@ -14,7 +14,7 @@ Single-cell ATAC+RNA linking (SCARlink) uses multiomic single-cell ATAC and RNA 
 
 ## Installation 
 
-It is optional to install SCARlink in a conda environment that also has R packages Seurat v4 and ArchR installed. If you already have the R packages installed and want to run SCARlink without conda, jump directly to step 2 of installation.
+It is optional to install SCARlink in a conda environment that also has R packages Seurat v4 and ArchR installed. If you already have the R packages installed and want to run SCARlink without conda, jump directly to [step 2](https://github.com/snehamitra/SCARlink?tab=readme-ov-file#2-scarlink-installation) of installation. Alternatively, for Docker setup, jump to step 3.
 
 #### 1. Conda setup
 
@@ -57,6 +57,14 @@ Download SCARlink from GitHub and install
 ```
 git clone https://github.com/snehamitra/SCARlink.git
 pip install -e SCARlink
+```
+
+#### 3. Docker setup
+
+Skip steps 1 and 2 if you want to run SCARlink inside a Docker container. Visit [wiki](https://github.com/snehamitra/SCARlink/wiki/1.-Installation#4-docker-setup) for additional details. First install [Docker](https://docs.docker.com/get-docker/) and then run SCARlink inside container as follows
+
+```
+docker run -it --rm --memory=50g mitrasneha/scarlink:latest
 ```
 
 ## Usage
