@@ -20,7 +20,7 @@ get_gene_tile_matrix <- function(scatac.object, scrna.object, window_size=250000
     geneUpstream = window_size 
     geneDownstream = window_size
     geneRegions <- trim(extendGR(gr = geneRegions, upstream = geneUpstream, downstream = geneDownstream))
-    geneRegions <- geneRegions[geneRegions$symbol %in% scrna.object$RNA@var.features, ]
+    geneRegions <- geneRegions[geneRegions$symbol %in% VariableFeatures(scrna.object), ]
 
     tm <- getMatrixFromProject(
         ArchRProj = scatac.object,
