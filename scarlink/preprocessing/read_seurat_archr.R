@@ -125,9 +125,7 @@ write_files <- function(archr_out, seurat_out, out_dir, window_size, ncores, sca
 	scale.factor = 10000
     }
     
-    if(scale != 'none'){
-    	scrna.object <- NormalizeData(scrna.object, normalization.method = "RC", scale.factor=scale.factor)
-    }
+    scrna.object <- NormalizeData(scrna.object, normalization.method = "RC", scale.factor=scale.factor)
 
     ### Create output directory if it doesn't exist
     if(!file.exists(out_dir)){

@@ -9,7 +9,7 @@ def main():
     parser.add_argument('-o', '--outdir', required=True, type=str, help="Output directory. The same output directory must be used later to run scarlink and scarlink_tiles.")
     parser.add_argument('--window', required=False, type=int, help="Number of bases to consider beyond the gene body both upstream and downstream. Default is 250000.")
     parser.add_argument('-nc', '--ncores', required=False, type=int, help="Number of cores to parallelize the preprocessing step. Default is 5.")
-    parser.add_argument('--scale', required=False, type=str, choices=['median', '10k', 'none'], help="scRNA-seq normalization scaling factor. Default is none; meaning re-normalization will not be done. The normalized matrix in the Seurat object will be used.")
+    parser.add_argument('--scale', required=False, type=str, choices=['median', '10k'], help="scRNA-seq normalization scaling factor. Default is 10k")
     args = parser.parse_args()
 
     rscript_dir = '/'.join(__file__.split('/')[:-1]) + '/'
@@ -26,7 +26,7 @@ def main():
     if args.ncores is None:
         args.ncores = 5
     if args.scale is None:
-        args.scale = 'none'
+        args.scale = '10k'
     print("Using " + str(args.ncores) + " cores")
 
     # create config 
