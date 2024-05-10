@@ -13,7 +13,7 @@ Single-cell ATAC+RNA linking (SCARlink) uses multiomic single-cell ATAC and RNA 
 
 
 **Note:** The equation for the loss function was incorrectly typeset in the original paper and should be: 
-      $$\frac{1}{N}\sum_{i=1}^{N} \left(e_i^{X_i\mathbf{w}+\epsilon} - Y_i(X_i\mathbf{w} + \epsilon)\right) + \alpha\|\mathbf{w}\|_2^2$$
+      $$\frac{1}{N}\sum_{i=1}^{N} \left(e_i^{X_i\mathbf{w}+\epsilon} - Y_i(X_i\mathbf{w} + \epsilon)\right) + \alpha\|\|\mathbf{w}\|\|_2^2$$
 
 Additionally, the default proportion of held-out data in model evaluation is 0.25 rather than 0.2 (one-fifth) as currently mentioned in the [Methods](https://www.nature.com/articles/s41588-024-01689-8#Sec9). 
 ## Installation 
