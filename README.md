@@ -11,7 +11,10 @@ Single-cell ATAC+RNA linking (SCARlink) uses multiomic single-cell ATAC and RNA 
 <img src="docs/model_outline.jpg" width=90%>
 </div>
 
+**Note:** The equation for the loss function was incorrectly typeset in the original paper and should be: 
+      $$\frac{1}{N}\sum_{i=1}^{N} \left(e_i^{X_i\mathbf{w}+\epsilon} - Y_i(X_i\mathbf{w} + \epsilon)\right) + \alpha\|\mathbf{w}\|_2^2$$
 
+Additionally, the default proportion of held-out data in model evaluation is 0.25 rather than 0.2 (one-fifth) as currently mentioned in the [Methods](https://www.nature.com/articles/s41588-024-01689-8#Sec9). 
 ## Installation 
 
 It is optional to install SCARlink in a conda environment that also has R packages Seurat v4 and ArchR installed. If you already have the R packages installed and want to run SCARlink without conda, jump directly to [step 2](https://github.com/snehamitra/SCARlink?tab=readme-ov-file#2-scarlink-installation) of installation. Alternatively, for Docker setup, jump to [step 3](https://github.com/snehamitra/SCARlink?tab=readme-ov-file#3-docker-setup).
