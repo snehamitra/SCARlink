@@ -11,6 +11,7 @@ Single-cell ATAC+RNA linking (SCARlink) uses multiomic single-cell ATAC and RNA 
 <img src="docs/model_outline.jpg" width=90%>
 </div>
 
+
 **Note:** The equation for the loss function was incorrectly typeset in the original paper and should be: 
       $$\frac{1}{N}\sum_{i=1}^{N} \left(e_i^{X_i\mathbf{w}+\epsilon} - Y_i(X_i\mathbf{w} + \epsilon)\right) + \alpha\|\mathbf{w}\|_2^2$$
 
