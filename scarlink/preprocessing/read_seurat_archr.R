@@ -186,18 +186,18 @@ write_files <- function(archr_out, seurat_out, out_dir, window_size, ncores, sca
 
 
     ## Save LSI, cell_info, and KNN as csv files
-    # lsi <- getReducedDims(ArchRProj = scatac.object, reducedDims = "IterativeLSI")
-    # lsi <- lsi[match(colnames(scrna.object), rownames(lsi)), ]
+    lsi <- getReducedDims(ArchRProj = scatac.object, reducedDims = "IterativeLSI")
+    lsi <- lsi[match(colnames(scrna.object), rownames(lsi)), ]
 
-    # write.table(lsi, file = paste(out_dir, 'scatac_LSI.csv', sep=""), row.names = FALSE, quote = FALSE, sep='\t')
+    write.table(lsi, file = paste(out_dir, 'scatac_LSI.csv', sep=""), row.names = FALSE, quote = FALSE, sep='\t')
 
     write.table(cell.info, file=paste(out_dir, 'cell_info.txt', sep=""), row.names=FALSE, quote=FALSE, sep='\t')
 
-    # ## Create KNN graph and save
-    # nbrs <- nabor::knn(lsi, lsi, k = 50)$nn.idx
-    # dists <- nabor::knn(lsi, lsi, k = 50)$nn.dists
-    # nbrs <- nbrs - 1
-    # write.table(nbrs, file=paste(out_dir, "knn-50-scatac.csv", sep=""), quote=FALSE, sep='\t', row.names=FALSE, col.names=FALSE)
+    ## Create KNN graph and save
+    nbrs <- nabor::knn(lsi, lsi, k = 50)$nn.idx
+    dists <- nabor::knn(lsi, lsi, k = 50)$nn.dists
+    nbrs <- nbrs - 1
+    write.table(nbrs, file=paste(out_dir, "knn-50-scatac.csv", sep=""), quote=FALSE, sep='\t', row.names=FALSE, col.names=FALSE)
 
     ## Save variable genes list
     # scrna.object <- FindVariableFeatures(scrna.object, selection.method = "vst", nfeatures = 5000)	
