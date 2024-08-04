@@ -1,6 +1,7 @@
 import os
 import logging
 import argparse
+import pandas
 from datetime import datetime
 from scarlink.src.model import RegressionModel
 
@@ -12,6 +13,7 @@ def main():
     parser.add_argument('-np', '--nproc', required=False, type=int, help="Number of parallel jobs. Default value is 100 when -p is provided.")
     parser.add_argument('-c', '--celltype', required=False, type=str, help="Cell type column name. This column should be present in the Seurat/ArchR object provided in scarlink_processing.")
     parser.add_argument('--sparsity', required=False, type=float, help="Maximum allowed sparsity in gene expression vector to run the regression model. Default is 0.9 meaning there can be at most 90 percent zeros in the gene expression vector.")
+    parser.add_argument('--gene_list', required=False, type=str, help="Text file with gene names to run SCARlink on. Note that these genes must be a subset of highly variable genes in the Seurat object. By default SCARlink is run on all highly variable genes above the given sparsity threshold") 
     args = parser.parse_args()
     dirname = args.outdir
     dirname = dirname + '/' if dirname[-1] != '/' else dirname
@@ -40,6 +42,13 @@ def main():
     logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', filename=log_file_name, level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
     rm = RegressionModel(input_file, output_dir, log_file_name, gtf_file=gtf_file, out_file_name = 'coefficients_' + str(p_ix) + '.hd5')
+
+    # subset genes if gene-list is provided
+    if args.gene_list is not None:
+        gene_list = pandas.read_csv(args.gene_list, header=None)[0].values
+        rm.gene_names = rm.gene_names[rm.gene_names.isin(gene_list)]
+        print("Running SCARlink on gene set from", args.gene_list)
+
     if p_ix is None:
         gene_names = rm.gene_names
     else:
