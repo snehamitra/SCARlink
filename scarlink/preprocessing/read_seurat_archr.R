@@ -42,7 +42,6 @@ get_gene_tile_matrix <- function(scatac.object, scrna.object, window_size=250000
 
     tm.filtered <- tm.filtered[, match(colnames(scrna.object), colnames(tm))]
     rowData(tm.filtered)$end <- rowData(tm.filtered)$start + tile_size
-
     return(tm.filtered)
 }
 
@@ -161,6 +160,7 @@ write_files <- function(archr_out, seurat_out, out_dir, window_size, ncores, sca
     
     tmp_files <- bplapply(1:max_ix, FUN = function(i) {
     	   selected.genes.subset <- selected.genes[seq(i, length(selected.genes), max_ix)]
+
     	   split_write_hdf5(out_dir, selected.genes.subset, tm.filtered[rowData(tm.filtered)$symbol %in% selected.genes.subset, ])
            }, 
            BPPARAM=bpparam) 

@@ -787,7 +787,7 @@ class RegressionModel:
 
         if cmap is None:
             if len(cluster_order) == 0:
-                clusters = sorted(list(set(self.cell_info.dropna()[groups])))
+                clusters = sorted(list(set(self.cell_info[groups].dropna())))
             else:
                 clusters = cluster_order
             cmap = create_colormap(clusters)
