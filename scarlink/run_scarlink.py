@@ -2,6 +2,7 @@ import os
 import logging
 import argparse
 import pandas
+from configparser import ConfigParser
 from datetime import datetime
 from scarlink.src.model import RegressionModel
 
@@ -41,8 +42,20 @@ def main():
     log_file_name = log_dir + log_file_name
     logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', filename=log_file_name, level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
-    rm = RegressionModel(input_file, output_dir, log_file_name, gtf_file=gtf_file, out_file_name = 'coefficients_' + str(p_ix) + '.hd5')
+    config_file_path = dirname + 'config.ini'
+    config = ConfigParser()
+    read_files = config.read(config_file_path)
 
+    input_format = config['PREPROCESSINFO']['input_format']
+    gtf_file = config['PREPROCESSINFO']['gtf_file']
+    norm_factor = config['PREPROCESSINFO']['norm_factor_scatac']
+    
+    # TO DO: Update for anndata format
+    if input_format == 'rds':
+        rm = RegressionModel(input_file, output_dir, log_file_name, gtf_file=gtf_file, out_file_name='coefficients_' + str(p_ix) + '.hd5', norm_factor=norm_factor)
+    else:
+        rm = RegressionModel(input_file, output_dir, log_file_name, gtf_file=gtf_file, out_file_name='coefficients_' + str(p_ix) + '.hd5', norm_factor=norm_factor)
+        # rm = RegressionModelNew(output_dir, log_file_name, gtf_file=gtf_file, out_file_name='coefficients_' + str(p_ix) + '.hd5')
     # subset genes if gene-list is provided
     if args.gene_list is not None:
         gene_list = pandas.read_csv(args.gene_list, header=None)[0].values
@@ -55,7 +68,7 @@ def main():
         gene_names = [rm.gene_names[i] for i in range(p_ix, len(rm.gene_names), total_procs)]
 
     for gene in gene_names:
-        rm.train_test_model(gene, normalization_factor='ReadsInTSS',
+        rm.train_test_model(gene, 
                             epochs=20, verbose=False, max_zero_fraction=args.sparsity) 
 
     # computing Shapley values

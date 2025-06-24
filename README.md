@@ -37,7 +37,7 @@ conda config --add channels bioconda
 conda config --add channels conda-forge
 ```
 
-Install essential R packages<sup>*</sup>
+(Optional if inputs are in anndata format) Install essential R packages<sup>*</sup>
 
 ```
 conda install -c conda-forge r-seurat r-devtools r-biocmanager
@@ -48,7 +48,7 @@ conda install -c bioconda bioconductor-rhdf5 \
                      bioconductor-complexheatmap
 ```
 
-Install ArchR in the conda environment inside R
+(Optional if inputs are in anndata format) Install ArchR in the conda environment inside R
 
 ``` r
 devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())
@@ -80,6 +80,12 @@ Run `scarlink_preprocessing` to generate `coasssay_matrix.h5` to use as input to
 
 ```
 scarlink_processing --scrna scrna_seurat.rds --scatac scatac_archr -o multiome_out
+```
+
+**UPDATE: Inputs can now be provided in anndata format. See [notebook](https://github.com/snehamitra/SCARlink_private/blob/main/notebooks/preprocessing_scRNA_scATAC_python.ipynb) for more details.**
+
+```
+scarlink_processing --scrna scrna_adata.h5ad --scatac scatac_adata.h5ad -o multiome_out
 ```
 
 #### 2. Running locally

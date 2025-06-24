@@ -4,7 +4,7 @@ import platform
 config = {
     'name': 'scarlink',
     'description': 'Single-cell ATAC+RNA linking using regularized Poisson regression',
-    'version': '1.0.0',
+    'version': '1.1.0',
     'packages': ['scarlink'],
     'setup_requires': [],
     'install_requires': ['shap==0.41.0',

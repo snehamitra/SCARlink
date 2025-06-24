@@ -9,6 +9,16 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from sklearn.model_selection import train_test_split
 
+# def construct_cell_info_new(scrna, scatac):
+#     """Return cell_info data frame from scrna and scatac
+#     """
+#     common_cols = scrna.obs.columns[scrna.obs.columns.isin(scatac.obs.columns)]
+#     if len(common_cols)==0:
+#         df = scrna.obs.join(scatac.obs, left_index=True, right_index=True)
+#     else:
+#         df = scrna.obs.join(scatac.obs.loc[:, ~scatac.obs.columns.isin(common_cols)], left_index=True, right_index=True)
+#     return df
+
 def construct_cell_info(f, group_cells):
     """Return cell_info data frame in coassay_matrix.h5.
     """
@@ -32,6 +42,13 @@ def construct_cell_info(f, group_cells):
     cell_name = ['train_' + str(i) for i in range(train_cells.shape[1])] + ['test_' + str(i) for i in range(test_cells.shape[1])]
     group_cell_info['cell_name'] = cell_name
     return group_cell_info
+
+# def construct_gex_mat_new(scrna):
+#     """Extract gene expression matrix.
+#     """
+#     scrna_sub = scrna[:, scrna.var['seqnames'] is not None]
+#     gex_matrix = scrna_sub.X
+#     return gex_matrix
 
 def construct_gex_mat(f, cell_info, group_cells):
     """Extract gene expression matrix.
@@ -82,6 +99,16 @@ def get_train_test_split(f, gex_matrix, random_state, group_cells):
     group_train_ix = np.arange(train_cells.shape[1])
     group_test_ix = train_cells.shape[1] + np.arange(test_cells.shape[1])
     return group_train_ix, group_test_ix
+
+# def get_gene_tile_matrix_group_cells_new(scatac, scrna, gene):
+#     """Extract tile-based accessibility matrix centered on given gene.
+#     The accessibility matrix is not normalized."""
+#     ch = scrna.var[scrna.var_names==gene].iloc[0]['seqnames']
+#     start = scrna.var[scrna.var_names==gene].iloc[0]['start']
+#     end = scrna.var[scrna.var_names==gene].iloc[0]['end']
+#     tile_gene_mat = scatac[:, (scatac.var['seqnames']==ch) & (scatac.var['start']<=end) &
+#                         (scatac.var['end']>=start)].X
+#     return tile_gene_mat
 
 def get_gene_tile_matrix_group_cells(f, gene, group_cells):
     """Extract tile-based accessibility matrix centered on given gene.

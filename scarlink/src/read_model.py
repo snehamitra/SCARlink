@@ -34,10 +34,11 @@ def read_model(out_dir, out_file_name = 'coefficients.hd5', input_file_name='', 
     dirname = '/'.join(out_dir[:-1].split('/')[:-1]) + '/'
     input_file_name = dirname + 'coassay_matrix.h5'
     gtf_file = f['genes'].attrs['gtf_file']
+    norm_factor = f['genes'].attrs['norm_factor_scatac']
     scatac_fragment_file = f['genes'].attrs['scatac_fragment_file']
     f.close()
 
     if read_only: mode = 'r'
     else: mode = 'a'
-    m = RegressionModel(input_file = input_file_name, output_dir = out_dir, gtf_file = gtf_file, scatac_fragment_file = scatac_fragment_file, out_file_name = out_file_name, mode=mode)
+    m = RegressionModel(input_file = input_file_name, output_dir = out_dir, gtf_file = gtf_file, scatac_fragment_file = scatac_fragment_file, out_file_name = out_file_name, mode=mode, norm_factor=norm_factor)
     return m
