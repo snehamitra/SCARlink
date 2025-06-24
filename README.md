@@ -60,7 +60,7 @@ Download SCARlink from GitHub and install
 
 ```
 git clone https://github.com/snehamitra/SCARlink.git
-pip install -e SCARlink
+pip install SCARlink
 ```
 
 #### 3. Docker setup
