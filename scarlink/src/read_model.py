@@ -34,7 +34,11 @@ def read_model(out_dir, out_file_name = 'coefficients.hd5', input_file_name='', 
     dirname = '/'.join(out_dir[:-1].split('/')[:-1]) + '/'
     input_file_name = dirname + 'coassay_matrix.h5'
     gtf_file = f['genes'].attrs['gtf_file']
-    norm_factor = f['genes'].attrs['norm_factor_scatac']
+    if 'norm_factor_scatac' in f['genes'].attrs:
+        norm_factor = f['genes'].attrs['norm_factor_scatac']
+    else:
+        print("Reading older version of SCARlink object. Setting norm_factor to ReadsInTSS")
+        norm_factor = 'ReadsInTSS'
     scatac_fragment_file = f['genes'].attrs['scatac_fragment_file']
     f.close()
 
