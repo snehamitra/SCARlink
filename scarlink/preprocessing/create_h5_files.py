@@ -7,7 +7,7 @@ def main():
     parser.add_argument('--scrna', required=True, type=str, help="Seurat/AnnData object of scRNA-seq data. The cell names must match the cell names in the scATAC-seq object. If AnnData then the scATAC-seq object must also be AnnData.")
     parser.add_argument('--scatac', required=True, type=str, help="ArchR/AnnData object of scATAC-seq data. The cell names must match the cell names in scRNA-seq object. If AnnData then the scRNA-seq object must also be AnnData.")
     parser.add_argument('-o', '--outdir', required=True, type=str, help="Output directory. The same output directory must be used later to run scarlink and scarlink_tiles.")
-    parser.add_argument('-g', '--genome', required=True, type=str, help="Default genome choices include mm10, hg38, hg19. Alternatively, a GTF file can be provided as input.") # , choices=['mm10', 'hg38', 'hg19']
+    parser.add_argument('-g', '--genome', required=True, type=str, help="Default genome choices include mm10, mm39, hg38, hg19. Alternatively, a GTF file can be provided as input.") # , choices=['mm10', 'mm39', 'hg38', 'hg19']
     parser.add_argument('--chrom-sizes', required=False, type=str, help="chrom.sizes file. Required when using custom genome.")
     parser.add_argument('--norm-factor-scatac', required=False, type=str, help="Normalization factor for tile matrix. Default is nFrags. Replace with other factor. Original version used ReadsInTSS from ArchR.")
     parser.add_argument('--window', required=False, type=int, help="Number of bases to consider beyond the gene body both upstream and downstream. Default is 250000.")
@@ -23,7 +23,7 @@ def main():
     genome = args.genome
     norm_factor = 'nFrags' if args.norm_factor_scatac is None else args.norm_factor_scatac
     path = '/'.join(__file__.split('/')[:-1]) + '/../data/'
-    if gtf_file in ['mm10', 'hg19', 'hg38']:
+    if gtf_file in ['mm10', 'hg19', 'hg38', 'mm39']:
         chrom_sizes = path + gtf_file + '.chrom.sizes'
         gtf_file = path + gtf_file + '.refGene.gtf.gz'
     else:
